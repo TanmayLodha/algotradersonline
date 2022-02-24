@@ -1,0 +1,108 @@
+@import "../../global.scss";
+
+.main-register {
+  height: 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  .progress {
+    position: absolute;
+    width: 60vw;
+    top: 100px;
+    left: 35vw;
+  }
+
+  .back-icon {
+    background-color: $mainColor;
+    position: absolute;
+    margin: 50px;
+    font-size: 75px;
+    text-decoration: none;
+    color: white;
+    border-radius: 50%;
+  }
+
+  .register {
+    top: 150px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+
+    .box {
+      background-color: white;
+      width: 50vw;
+      height: 55vh;
+      border-radius: 5px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      .head {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .name {
+        display: flex;
+        .name-field {
+          margin: 10px;
+        }
+      }
+
+      .contact {
+        display: flex;
+        .email {
+          width: 55%;
+          margin: 10px;
+        }
+        .username {
+          width: 45%;
+          margin: 10px;
+        }
+      }
+
+      .password {
+        display: flex;
+        .pass {
+          width: 50%;
+          margin: 10px;
+        }
+      }
+
+      .submit {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .submit-button {
+          width: 25%;
+          margin: 20px;
+          background-color: $mainColor;
+        }
+        .register-text {
+          text-align: center;
+          text-decoration: none;
+        }
+      }
+
+      .demat-text {
+        text-align: center;
+        margin: 10px;
+      }
+
+      .demat {
+        width: 50%;
+        margin: 20px;
+        align-self: center;
+      }
+
+      .submit-button {
+        width: 25%;
+        margin: 20px;
+        background-color: $mainColor;
+        align-self: center;
+      }
+    }
+  }
+}
