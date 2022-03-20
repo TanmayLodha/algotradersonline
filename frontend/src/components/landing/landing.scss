@@ -14,7 +14,7 @@
     display: flex;
     justify-content: space-between;
     border-radius: 5px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     background-color: white;
 
     .left {
@@ -42,8 +42,61 @@
     position: absolute;
     top: 100px;
     bottom: 22vh;
-    // height: 100vh;
     width: 100vw;
+
+    .home {
+      padding: 20px;
+      display: flex;
+
+      .section {
+        width: 40vw;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        h2 {
+          margin: 0;
+        }
+
+        p {
+          width: 500px;
+          text-align: center;
+        }
+        .explore-btn {
+          height: 65px;
+          width: 200px;
+          background-color: $mainColor;
+
+          .explore {
+            color: white;
+            text-decoration: none;
+          }
+        }
+
+        .supported {
+          margin: 0;
+          margin-top: 25px;
+          opacity: 0.7;
+        }
+
+        img {
+          height: 70px;
+        }
+      }
+
+      .image {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        img {
+          width: 80%;
+          margin-right: 20px;
+          border-radius: 10px;
+        }
+      }
+    }
 
     .wave {
       position: absolute;

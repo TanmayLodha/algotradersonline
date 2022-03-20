@@ -1,4 +1,26 @@
 @import "../../global.scss";
 
-.navbar {
+.right {
+  .login-btn {
+    background-color: $mainColor;
+  }
+
+  .login-btn:hover {
+    background-color: #0052cc;
+  }
+
+  .register-btn {
+    border-color: $mainColor;
+    color: $mainColor;
+  }
+
+  .lightmode-btn {
+    border-color: #f9d71c;
+    color: #f9d71c;
+  }
+
+  .lightmode-btn:hover {
+    background-color: rgba(249, 215, 28, 0.1);
+    border-color: #f9d71c;
+  }
 }

@@ -1,46 +1,51 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./components/landing/Landing";
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import Dashboard from "./components/dashboard/Dashboard";
+import { UserContext } from "./UserContext";
 
 function App() {
-  const [token, setToken] = useState("");
-  const [Auth, setAuth] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const userLogin = (tok) => {
-    if (tok !== undefined) {
-      setToken(tok);
-      setAuth(true);
-      console.log(token);
-    }
-  };
+  //Load the user from storage
+  useEffect(() => {
+    const u = localStorage.getItem("user");
+    u && JSON.parse(u) ? setUser(true) : setUser(false);
+  }, []);
+
+  // store user inn localstorage
+  // everytime user changes
+  useEffect(() => {
+    localStorage.setItem("user", user);
+  }, [user]);
 
   return (
     <Routes>
-      {!Auth && (
+      {!user && (
         <>
-          <Route path="/" element={<Landing token={token} />} />
-          <Route path="/login" element={<Login userLogin={userLogin} />} />
+          <Route path="/" element={<Landing />} />
+          <Route
+            path="/login"
+            element={<Login authenticate={() => setUser(true)} />}
+          />
           <Route path="/register" element={<Register />} />
         </>
       )}
 
-      {Auth && (
+      {user && (
         <>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+            path="/dashboard"
+            element={<Dashboard removeUser={() => setUser(false)} />}
+          />
         </>
       )}
 
       <Route
         path="*"
-        element={<Navigate to={Auth ? "/dashboard" : "/login"} />}
+        element={<Navigate to={user ? "/dashboard" : "/login"} />}
       />
     </Routes>
   );

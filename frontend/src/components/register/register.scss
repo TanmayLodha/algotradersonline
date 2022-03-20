@@ -5,6 +5,7 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+
   .progress {
     position: absolute;
     width: 60vw;
@@ -22,52 +23,64 @@
     border-radius: 50%;
   }
 
-  .register {
-    top: 150px;
-    position: relative;
+  .box {
+    position: absolute;
+    left: 34%;
+    top: 20%;
+    background-color: white;
+    width: 30vw;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 10px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
 
-    .box {
-      background-color: white;
-      width: 50vw;
-      height: 55vh;
-      border-radius: 5px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      padding: 10px;
+    .head {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .page1 {
       display: flex;
       flex-direction: column;
-      .head {
+      margin: 10px;
+
+      .field {
+        margin: 5px;
+      }
+
+      .email {
         display: flex;
-        justify-content: center;
         align-items: center;
-      }
+        position: relative;
 
-      .name {
-        display: flex;
-        .name-field {
-          margin: 10px;
-        }
-      }
-
-      .contact {
-        display: flex;
-        .email {
-          width: 55%;
-          margin: 10px;
-        }
-        .username {
-          width: 45%;
-          margin: 10px;
+        .mail {
+          width: 100%;
         }
       }
 
-      .password {
+      .c_pass {
         display: flex;
-        .pass {
-          width: 50%;
-          margin: 10px;
+        align-items: center;
+        position: relative;
+
+        .cp {
+          width: 100%;
         }
+      }
+
+      .error {
+        color: red;
+        position: absolute;
+        right: 2%;
+      }
+
+      .success {
+        color: rgb(119, 193, 10);
+        position: absolute;
+        right: 2%;
       }
 
       .submit {
@@ -85,24 +98,28 @@
           text-decoration: none;
         }
       }
+    }
 
-      .demat-text {
-        text-align: center;
-        margin: 10px;
-      }
-
+    .page2 {
+      display: flex;
+      flex-direction: column;
       .demat {
         width: 50%;
         margin: 20px;
         align-self: center;
       }
-
-      .submit-button {
-        width: 25%;
-        margin: 20px;
-        background-color: $mainColor;
-        align-self: center;
+      .demat-text {
+        font-size: 30px;
+        text-align: center;
+        margin: 10px;
       }
+    }
+
+    .submit-button {
+      width: 25%;
+      margin: 20px;
+      background-color: $mainColor;
+      align-self: center;
     }
   }
 }

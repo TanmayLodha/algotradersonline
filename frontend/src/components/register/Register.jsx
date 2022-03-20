@@ -1,169 +1,186 @@
 import React, { useState } from "react";
 import "./register.scss";
-import { Box } from "@mui/system";
-import { TextField, Avatar, Typography, Button } from "@mui/material";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import { Link } from "react-router-dom";
+import { TextField, Button } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "react-step-progress-bar/styles.css";
-import { ProgressBar, step } from "react-step-progress-bar";
+import ErrorIcon from "@mui/icons-material/Error";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-function Register() {
+const Register = () => {
   const [page, setPage] = useState(1);
-  const [percent, setPercent] = useState(25);
+  const [passerror, setPasserror] = useState(false);
+  const [emailerror, setEmailerror] = useState(false);
 
-  const goNext = () => {
-    toast.success("Saved", {
-      position: "top-center",
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-    setPage((page) => page + 1);
-    setPercent(100);
+  const emailRegex = /\S+@\S+\.\S+/;
+
+  const [user, setUser] = useState({
+    username: "",
+    password: "",
+    email: "",
+    demat: "",
+    c_password: "",
+  });
+
+  const validatePassword = (e) => {
+    setUser({ ...user, c_password: e.target.value });
+    if (e.target.value !== user.password) {
+      setPasserror(true);
+    } else {
+      setPasserror(false);
+    }
   };
 
-  var sectionStyle = {
+  const validateEmail = (e) => {
+    setUser({ ...user, email: e.target.value });
+    const email = e.target.value;
+    if (emailRegex.test(email)) {
+      setEmailerror(false);
+    } else {
+      setEmailerror(true);
+    }
+  };
+
+  const goNext = () => {
+    if (
+      user.username === "" ||
+      user.email === "" ||
+      user.name === "" ||
+      user.password === ""
+    ) {
+      alert("Fields empty");
+    } else if (passerror || emailerror) alert("Invalid fields");
+    else {
+      console.log(user);
+      setPage((page) => page + 1);
+    }
+  };
+
+  const navigate = useNavigate();
+
+  const create = () => {
+    const credentials = {
+      username: user.username,
+      password: user.password,
+      email: user.email,
+    };
+    console.log(credentials);
+    fetch("http://127.0.0.1:8000/api/register/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials),
+    })
+      .then((data) => data.json())
+      .then((data) => {
+        if (data.token !== undefined) {
+          console.log(data.token);
+          navigate("/login");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const sectionStyle = {
     backgroundImage: `url(/blob-register.svg)`,
   };
 
   return (
     <div className="main-register" style={sectionStyle}>
-      <Link to="/" variant="body2">
+      <Link to="/">
         <ArrowBackIcon className="back-icon" />
       </Link>
-      <div className="progress">
-        <ProgressBar
-          percent={percent}
-          filledBackground="linear-gradient(to right, #408cff, #0066ff)"
-          width="50%"
-        />
-      </div>
 
-      <div className="register">
-        <Box component="form" noValidate autoComplete="off" className="box">
-          <div className="head">
-            <Avatar sx={{ m: 1 }}>
-              <PeopleAltIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Register
-            </Typography>
-          </div>
-          {page === 1 && (
-            <>
-              <UserDetails />
-              <div className="submit">
-                <Button
-                  type="submit"
-                  variant="contained"
-                  className="submit-button"
-                  onClick={goNext}>
-                  Continue
-                </Button>
-                <Link to="/login" variant="body2" className="register-text">
-                  {"Have an account? Login"}
-                </Link>
-              </div>
-            </>
-          )}
-          {page === 2 && (
-            <>
-              <Typography component="h1" variant="h5" className="demat-text">
-                Enter your Alice Blue Demat ID.
-              </Typography>
-              <DematDetails />
+      <div className="box">
+        <div className="head">
+          <h3>Register</h3>
+        </div>
+        {page === 1 && (
+          <div className="page1">
+            <TextField
+              name="username"
+              required
+              label="Username"
+              className="field"
+              autoComplete="off"
+              value={user.username}
+              onChange={(e) => setUser({ ...user, username: e.target.value })}
+            />
+            <div className="email">
+              <TextField
+                name="email"
+                required
+                label="Email Address"
+                className="field mail"
+                autoComplete="off"
+                value={user.email}
+                onChange={validateEmail}
+              />
+              {emailerror && <ErrorIcon className="error" />}
+              {user.email && !emailerror && (
+                <CheckCircleIcon className="success" />
+              )}
+            </div>
+
+            <TextField
+              name="password"
+              required
+              label="Password"
+              type="password"
+              className="field"
+              autoComplete="off"
+              value={user.password}
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
+            />
+            <div className="c_pass">
+              <TextField
+                name="confirm_password"
+                required
+                label="Confirm Password"
+                type="password"
+                className="field cp"
+                autoComplete="off"
+                value={user.c_password}
+                onChange={validatePassword}
+              />
+              {passerror && <ErrorIcon className="error" />}
+              {user.c_password && !passerror && (
+                <CheckCircleIcon className="success" />
+              )}
+            </div>
+
+            <div className="submit">
               <Button
-                className="login-button"
                 type="submit"
                 variant="contained"
-                className="submit-button">
-                Submit
+                className="submit-button"
+                onClick={goNext}>
+                Continue
               </Button>
-            </>
-          )}
-        </Box>
+              <Link to="/login" className="register-text">
+                {"Have an account? Login"}
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {page === 2 && (
+          <div className="page2">
+            <p className="demat-text">Enter your Alice Blue Demat ID.</p>
+            <DematDetails />
+            <Button
+              className="submit-button"
+              type="submit"
+              variant="contained"
+              onClick={create}>
+              Submit
+            </Button>
+          </div>
+        )}
       </div>
-      <ToastContainer
-        position="top-center"
-        autoClose={1000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
     </div>
-  );
-}
-
-const UserDetails = () => {
-  return (
-    <>
-      <div className="name">
-        <TextField
-          name="firstName"
-          required
-          fullWidth
-          id="firstName"
-          label="First Name"
-          autoFocus
-          className="name-field"
-        />
-        <TextField
-          required
-          fullWidth
-          id="lastName"
-          label="Last Name"
-          name="lastName"
-          className="name-field"
-        />
-      </div>
-
-      <div className="contact">
-        <TextField
-          required
-          id="email"
-          label="Email Address"
-          name="email"
-          className="email"
-        />
-
-        <TextField
-          required
-          id="username"
-          label="Username"
-          name="username"
-          className="username"
-        />
-      </div>
-
-      <div className="password">
-        <TextField
-          required
-          id="outlined-password-input"
-          label="Password"
-          type="password"
-          name="password"
-          className="pass"
-        />
-        <TextField
-          required
-          id="outlined-password-input"
-          label="Confirm Password"
-          name="confirm_password"
-          type="password"
-          className="pass"
-        />
-      </div>
-    </>
   );
 };
 
@@ -175,6 +192,7 @@ const DematDetails = () => {
       label="Demat account"
       name="demat"
       className="demat"
+      autoComplete="off"
     />
   );
 };

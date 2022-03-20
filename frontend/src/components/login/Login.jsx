@@ -3,15 +3,15 @@ import "./login.scss";
 import { Box } from "@mui/system";
 import { TextField, Avatar, Typography, Button, Alert } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function Login(props) {
+function Login({ authenticate }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
   const login = (e) => {
     e.preventDefault();
     if (username === "" || password === "") {
@@ -28,7 +28,7 @@ function Login(props) {
     }
     const credentials = { username: username, password: password };
     console.log(credentials);
-    fetch("http://127.0.0.1:8000/auth/", {
+    fetch("http://127.0.0.1:8000/api/login/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
@@ -36,7 +36,9 @@ function Login(props) {
       .then((data) => data.json())
       .then((data) => {
         if (data.token !== undefined) {
-          props.userLogin(data.token);
+          authenticate();
+          navigate("/dashboard", { replace: true });
+          console.log(data.token);
         } else {
           toast.error("Invalid login. Try agian!", {
             position: "top-center",
@@ -50,7 +52,21 @@ function Login(props) {
           return;
         }
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        toast.error(
+          "Unable to connect. Please check your internet connection!",
+          {
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+        console.error(error);
+      });
   };
 
   var sectionStyle = {
@@ -94,7 +110,6 @@ function Login(props) {
               className="field"
             />
             <Button
-              className="login-button"
               type="submit"
               variant="contained"
               className="field in-btn"

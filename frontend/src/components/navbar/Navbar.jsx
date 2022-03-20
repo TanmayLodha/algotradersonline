@@ -2,6 +2,7 @@ import React from "react";
 import "./navbar.scss";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
+import LightModeIcon from "@mui/icons-material/LightMode";
 
 export default function Navbar() {
   return (
@@ -12,13 +13,17 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="right">
+        <Button className="btn lightmode-btn" variant="outlined">
+          <LightModeIcon />
+        </Button>
+
         <Link to="/login">
-          <Button className="btn" variant="contained">
+          <Button className="btn login-btn" variant="contained">
             Login
           </Button>
         </Link>
         <Link to="/register">
-          <Button className="btn" variant="outlined">
+          <Button className="btn register-btn" variant="outlined">
             Register
           </Button>
         </Link>
