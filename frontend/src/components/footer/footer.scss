@@ -1,5 +1,8 @@
+@import "../../global.scss";
+
 .footer {
   display: flex;
+  justify-content: space-between;
 
   .left {
     width: 60vw;
@@ -27,7 +30,7 @@
       a {
         text-decoration: underline dotted;
         opacity: 0.5;
-        color: white;
+        color: $alternateColor;
       }
 
       p {
@@ -40,7 +43,8 @@
 
   .right {
     display: flex;
-    flex-direction: column;
+
+    border-left: 5px $alternateColor;
 
     .phone,
     .email,
@@ -53,8 +57,7 @@
       a {
         text-decoration: none;
         margin-left: 10px;
-        color: white;
-        opacity: 0.8;
+        color: black;
       }
     }
   }

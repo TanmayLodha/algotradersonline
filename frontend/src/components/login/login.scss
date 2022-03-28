@@ -1,28 +1,10 @@
 @import "../../global.scss";
 
 .main {
-  .Toastify__toast--warning {
-    background: yellow;
-    color: black;
-  }
-  .Toastify__toast--error {
-    background: #cf142b;
-    color: white;
-  }
   height: 100vh;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-
-  .backicon {
-    background-color: $mainColor;
-    position: absolute;
-    margin: 50px;
-    font-size: 75px;
-    text-decoration: none;
-    color: white;
-    border-radius: 50%;
-  }
 
   .login {
     top: 150px;
@@ -58,7 +40,7 @@
         }
 
         .in-btn {
-          background-color: $mainColor;
+          background-color: $alternateColor;
         }
 
         .register-text {

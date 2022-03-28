@@ -1,4 +1,83 @@
+@import "../../global.scss";
+
 .dashboard {
-  top: 150px;
   height: 100vh;
+  width: 100vw;
+  display: flex;
+
+  .left {
+    width: 5vw;
+    position: fixed;
+
+    top: 70px;
+
+    .sidebar-s {
+      height: 100vh;
+      background-color: $mainColor;
+      border-right: 1px solid;
+      border-top: 1px solid;
+      border-color: rgba(129, 129, 130, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .sidebarlist {
+        padding: 0;
+
+        .sidebaricon {
+          text-decoration: none;
+          color: black;
+
+          li {
+            list-style: none;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.1s ease-out;
+            &:hover {
+              background-color: $alternateColor;
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .right-s {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    background-color: $mainColor;
+    width: 98vw;
+    height: 70px;
+    border-bottom: 1px solid;
+    border-color: rgba(129, 129, 130, 0.2);
+    padding-left: 20px;
+    padding-right: 20px;
+    z-index: 100;
+
+    .profile {
+      height: 50px;
+      width: 50px;
+    }
+  }
+
+  .content {
+    position: absolute;
+    left: 5vw;
+    top: 70px;
+  }
 }

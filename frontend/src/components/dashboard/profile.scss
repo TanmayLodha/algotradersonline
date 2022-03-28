@@ -1,0 +1,81 @@
+@import "../../global.scss";
+
+.profile {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+
+  .above {
+    height: 70px;
+    width: 100vw;
+    padding-left: 20px;
+  }
+
+  .bottom {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+
+    .card {
+      position: absolute;
+      left: 35vw;
+      top: 5vw;
+      background-color: white;
+
+      border-radius: 5px;
+
+      margin: 0;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+
+      h3 {
+        text-align: center;
+      }
+
+      .contents {
+        .user {
+          margin: 10px;
+          width: 96%;
+        }
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+
+        .in-btn {
+          background-color: $mainColor;
+          color: $alternateColor;
+
+          &:hover {
+            background-color: $alternateColor;
+            color: $mainColor;
+          }
+        }
+      }
+
+      .pass {
+        transition: all 0l35s ease-out;
+        .error {
+          color: red;
+          position: absolute;
+          right: 2%;
+        }
+
+        .success {
+          color: rgb(119, 193, 10);
+          position: absolute;
+          bottom: 17%;
+          right: 3%;
+        }
+      }
+    }
+  }
+}

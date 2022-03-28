@@ -13,9 +13,9 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="right">
-        <Button className="btn lightmode-btn" variant="outlined">
+        {/* <Button className="btn lightmode-btn" variant="outlined">
           <LightModeIcon />
-        </Button>
+        </Button> */}
 
         <Link to="/login">
           <Button className="btn login-btn" variant="contained">

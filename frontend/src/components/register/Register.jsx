@@ -1,17 +1,23 @@
 import React, { useState } from "react";
 import "./register.scss";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Alert } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import "react-toastify/dist/ReactToastify.css";
-import "react-step-progress-bar/styles.css";
 import ErrorIcon from "@mui/icons-material/Error";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Snackbar } from "@mui/material";
+import { Step, Stepper, StepLabel } from "@mui/material";
 
 const Register = () => {
   const [page, setPage] = useState(1);
   const [passerror, setPasserror] = useState(false);
   const [emailerror, setEmailerror] = useState(false);
+  const [open, setOpen] = useState(false); //snackbar
+  const [msg, setMsg] = useState(""); //alert messagge
+  const [succ, setSucc] = useState(false); //snackbar success
+  const [activeStep, setActiveStep] = useState(0);
+
+  const msglist = ["Fields cannot be empty", "Invalid Fields"];
+  const steps = ["Personal Details", "Aliceblue Details"];
 
   const emailRegex = /\S+@\S+\.\S+/;
 
@@ -42,6 +48,11 @@ const Register = () => {
     }
   };
 
+  const snackBarClose = () => {
+    setOpen(false);
+    setSucc(false);
+  };
+
   const goNext = () => {
     if (
       user.username === "" ||
@@ -49,17 +60,25 @@ const Register = () => {
       user.name === "" ||
       user.password === ""
     ) {
-      alert("Fields empty");
-    } else if (passerror || emailerror) alert("Invalid fields");
-    else {
+      setMsg(msglist[0]);
+      setOpen(true);
+      return;
+    } else if (passerror || emailerror) {
+      setMsg(msglist[1]);
+      setOpen(true);
+      return;
+    } else {
+      setSucc(true);
       console.log(user);
       setPage((page) => page + 1);
+      setActiveStep(activeStep + 1);
     }
   };
 
   const navigate = useNavigate();
 
-  const create = () => {
+  const create = (e) => {
+    e.preventDefault();
     const credentials = {
       username: user.username,
       password: user.password,
@@ -74,28 +93,52 @@ const Register = () => {
       .then((data) => data.json())
       .then((data) => {
         if (data.token !== undefined) {
-          console.log(data.token);
+          console.log(data);
           navigate("/login");
         }
       })
       .catch((error) => {
+        // setMsg(error);
+        // setOpen(true);
         console.error(error);
       });
   };
 
-  const sectionStyle = {
-    backgroundImage: `url(/blob-register.svg)`,
-  };
-
   return (
-    <div className="main-register" style={sectionStyle}>
-      <Link to="/">
-        <ArrowBackIcon className="back-icon" />
-      </Link>
+    <div className="main-register">
+      <Snackbar
+        open={open}
+        autoHideDuration={5000}
+        onClose={snackBarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+        <Alert severity="error" variant="filled">
+          {msg}
+        </Alert>
+      </Snackbar>
 
+      <Snackbar
+        open={succ}
+        autoHideDuration={5000}
+        onClose={snackBarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+        <Alert severity="success" variant="filled">
+          Saved
+        </Alert>
+      </Snackbar>
       <div className="box">
+        <Stepper activeStep={activeStep}>
+          {steps.map((label, index) => {
+            const stepProps = {};
+            const labelProps = {};
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps}>{label}</StepLabel>
+              </Step>
+            );
+          })}
+        </Stepper>
         <div className="head">
-          <h3>Register</h3>
+          <h2>Register</h2>
         </div>
         {page === 1 && (
           <div className="page1">
@@ -169,7 +212,14 @@ const Register = () => {
         {page === 2 && (
           <div className="page2">
             <p className="demat-text">Enter your Alice Blue Demat ID.</p>
-            <DematDetails />
+            <TextField
+              required
+              id="demat-id"
+              label="Demat account"
+              name="demat"
+              className="demat"
+              autoComplete="off"
+            />
             <Button
               className="submit-button"
               type="submit"
@@ -181,19 +231,6 @@ const Register = () => {
         )}
       </div>
     </div>
-  );
-};
-
-const DematDetails = () => {
-  return (
-    <TextField
-      required
-      id="demat-id"
-      label="Demat account"
-      name="demat"
-      className="demat"
-      autoComplete="off"
-    />
   );
 };
 

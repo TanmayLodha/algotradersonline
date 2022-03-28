@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./components/landing/Landing";
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import Dashboard from "./components/dashboard/Dashboard";
+import Strategies from "./components/dashboard/Strategies";
 import { UserContext } from "./UserContext";
+import Profile from "./components/dashboard/Profile";
 
 function App() {
   const [user, setUser] = useState(null);
+  const providerValue = useMemo(() => ({ user, setUser }), [user, setUser]);
 
   //Load the user from storage
   useEffect(() => {
@@ -15,39 +18,31 @@ function App() {
     u && JSON.parse(u) ? setUser(true) : setUser(false);
   }, []);
 
-  // store user inn localstorage
+  // store user in localstorage
   // everytime user changes
   useEffect(() => {
     localStorage.setItem("user", user);
   }, [user]);
 
   return (
-    <Routes>
-      {!user && (
-        <>
-          <Route path="/" element={<Landing />} />
-          <Route
-            path="/login"
-            element={<Login authenticate={() => setUser(true)} />}
-          />
-          <Route path="/register" element={<Register />} />
-        </>
-      )}
+    <UserContext.Provider value={providerValue}>
+      <Routes>
+        {!user && (
+          <>
+            <Route path="/*" element={<Landing />} />
+          </>
+        )}
 
-      {user && (
-        <>
-          <Route
-            path="/dashboard"
-            element={<Dashboard removeUser={() => setUser(false)} />}
-          />
-        </>
-      )}
+        {user && (
+          <>
+            <Route path="/dashboard/*" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+          </>
+        )}
 
-      <Route
-        path="*"
-        element={<Navigate to={user ? "/dashboard" : "/login"} />}
-      />
-    </Routes>
+        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} />} />
+      </Routes>
+    </UserContext.Provider>
   );
 }
 

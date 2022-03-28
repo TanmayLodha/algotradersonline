@@ -1,27 +1,34 @@
-import React, { useContext } from "react";
-import { Button } from "@mui/material";
-
+import React, { useEffect, useState, useContext } from "react";
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import "./dashboard.scss";
-import { useNavigate } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import Topbar from "./Topbar";
+import Strategies from "./Strategies";
+import PaperTrade from "./PaperTrade";
+import Portfolio from "./Portfolio";
 
-function Dashboard({ removeUser }) {
-  const navigate = useNavigate();
+function Dashboard() {
+  useEffect(() => {
+    document.title = "Dashboard";
+  }, []);
 
-  const logout = () => {
-    removeUser();
-    localStorage.removeItem("user");
-    navigate("/login", { replace: true });
-  };
   return (
     <div className="dashboard">
-      <h1>Dashboard</h1>
-      <Button
-        type="submit"
-        variant="contained"
-        className="field in-btn"
-        onClick={logout}>
-        Logout
-      </Button>
+      <div className="left">
+        <Sidebar />
+      </div>
+
+      <div className="right-s">
+        <Topbar />
+        <div className="content">
+          <Routes>
+            <Route path="strategies" element={<Strategies />} />
+            <Route path="paperTrade" element={<PaperTrade />} />
+            <Route path="portfolio" element={<Portfolio />} />
+            <Route path="*" element={<Navigate to="portfolio" />} />
+          </Routes>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./login.scss";
 import { Box } from "@mui/system";
 import { TextField, Avatar, Typography, Button, Alert } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { UserContext } from "../../UserContext";
+import { Snackbar } from "@mui/material";
 
-function Login({ authenticate }) {
+function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [open, setOpen] = useState(false); //snackbar
+  const [msg, setMsg] = useState(""); //alert messagge
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
+
+  const msglist = [
+    "Fields cannot be empty",
+    "Invalid Login! Try again",
+    "Unable to connect. Please check your internet connection!",
+  ];
+
+  const snackBarClose = () => {
+    setOpen(false);
+  };
+
   const login = (e) => {
     e.preventDefault();
     if (username === "" || password === "") {
-      toast.warn("Cannot be empty", {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      setMsg(msglist[0]);
+      console.log(msg);
+      setOpen(true);
       return;
     }
     const credentials = { username: username, password: password };
@@ -36,49 +43,34 @@ function Login({ authenticate }) {
       .then((data) => data.json())
       .then((data) => {
         if (data.token !== undefined) {
-          authenticate();
+          setUser(true);
           navigate("/dashboard", { replace: true });
-          console.log(data.token);
+          console.log(data);
         } else {
-          toast.error("Invalid login. Try agian!", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
+          setMsg(msglist[1]);
+          console.log(msg);
+          setOpen(true);
           return;
         }
       })
       .catch((error) => {
-        toast.error(
-          "Unable to connect. Please check your internet connection!",
-          {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          }
-        );
-        console.error(error);
+        setMsg(msglist[2]);
+        console.log(msg);
+        setOpen(true);
       });
   };
 
-  var sectionStyle = {
-    backgroundImage: `url(/blob.svg)`,
-  };
-
   return (
-    <div className="main" style={sectionStyle}>
-      <Link to="/" variant="body2">
-        <ArrowBackIcon className="backicon" />
-      </Link>
-
+    <div className="main">
+      <Snackbar
+        open={open}
+        autoHideDuration={5000}
+        onClose={snackBarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+        <Alert severity="error" variant="filled">
+          {msg}
+        </Alert>
+      </Snackbar>
       <div className="login">
         <Box component="form" noValidate autoComplete="off" className="box">
           <div className="form">
@@ -122,17 +114,6 @@ function Login({ authenticate }) {
           </div>
         </Box>
       </div>
-      <ToastContainer
-        position="top-center"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
     </div>
   );
 }

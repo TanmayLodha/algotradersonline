@@ -6,35 +6,18 @@
   background-repeat: no-repeat;
   background-size: cover;
 
-  .progress {
-    position: absolute;
-    width: 60vw;
-    top: 100px;
-    left: 35vw;
-  }
-
-  .back-icon {
-    background-color: $mainColor;
-    position: absolute;
-    margin: 50px;
-    font-size: 75px;
-    text-decoration: none;
-    color: white;
-    border-radius: 50%;
-  }
-
   .box {
     position: absolute;
-    left: 34%;
+    left: 31%;
     top: 20%;
     background-color: white;
-    width: 30vw;
+    width: 35vw;
     border-radius: 5px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    padding: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding: 25px;
 
     .head {
       display: flex;
@@ -91,7 +74,7 @@
         .submit-button {
           width: 25%;
           margin: 20px;
-          background-color: $mainColor;
+          background-color: $alternateColor;
         }
         .register-text {
           text-align: center;
@@ -118,7 +101,7 @@
     .submit-button {
       width: 25%;
       margin: 20px;
-      background-color: $mainColor;
+      background-color: $alternateColor;
       align-self: center;
     }
   }
