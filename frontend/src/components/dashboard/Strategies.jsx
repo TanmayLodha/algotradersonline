@@ -10,7 +10,7 @@ function Strategies() {
 
   return (
     <div className="main-s">
-      <h1>Stategies</h1>
+      <h1>Strategies</h1>
       <hr />
       <div className="stratergy">
         {fake.map((data, i) => {
