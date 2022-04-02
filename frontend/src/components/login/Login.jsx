@@ -13,7 +13,7 @@ function Login() {
   const [open, setOpen] = useState(false); //snackbar
   const [msg, setMsg] = useState(""); //alert messagge
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext); //global context
 
   const msglist = [
     "Fields cannot be empty",
@@ -29,12 +29,10 @@ function Login() {
     e.preventDefault();
     if (username === "" || password === "") {
       setMsg(msglist[0]);
-      console.log(msg);
       setOpen(true);
       return;
     }
     const credentials = { username: username, password: password };
-    console.log(credentials);
     fetch("http://127.0.0.1:8000/api/login/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,20 +40,17 @@ function Login() {
     })
       .then((data) => data.json())
       .then((data) => {
-        if (data.token !== undefined) {
-          setUser(true);
+        if (data.token !== null) {
+          setUser(JSON.stringify(data));
           navigate("/dashboard", { replace: true });
-          console.log(data);
         } else {
           setMsg(msglist[1]);
-          console.log(msg);
           setOpen(true);
           return;
         }
       })
       .catch((error) => {
         setMsg(msglist[2]);
-        console.log(msg);
         setOpen(true);
       });
   };

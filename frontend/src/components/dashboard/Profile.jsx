@@ -1,5 +1,5 @@
 import { Button, TextField } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { UserContext } from "../../UserContext";
 import "./profile.scss";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,10 @@ function Profile() {
     email: "nitishkgupta@gmail.com",
     aliceblue: "123456",
   };
+
+  useEffect(() => {
+    document.title = "Profile";
+  }, []);
 
   var sectionStyle = {
     backgroundImage: `url(/circle-scatter.svg)`,

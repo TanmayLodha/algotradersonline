@@ -2,8 +2,31 @@
 
 .main-s {
   position: absolute;
-  //   height: 100vh;
+  // height: 100vh;
   width: 92vw;
   margin: 0;
   padding: 30px;
+
+  .stratergy {
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+
+    .strat-card {
+      width: 300px;
+      height: 250px;
+      margin: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+
+      .in-btn {
+        background-color: $mainColor;
+        color: $alternateColor;
+
+        &:hover {
+          background-color: $alternateColor;
+          color: white;
+        }
+      }
+    }
+  }
 }

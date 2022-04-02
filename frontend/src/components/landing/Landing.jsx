@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "./landing.scss";
 import Footer from "../footer/Footer";
 import Navbar from "../navbar/Navbar";
@@ -6,19 +6,24 @@ import { Button } from "@mui/material";
 import { Link, Routes, Route, Navigate } from "react-router-dom";
 import Register from "../register/Register";
 import Login from "../login/Login";
+import { UserContext } from "../../UserContext";
 
 function Landing(props) {
   const [navbar, setNavbar] = useState(false);
 
-  const changeBackground = () => {
-    if (window.scrollY > 40) {
-      setNavbar(true);
-    } else {
-      setNavbar(false);
-    }
-  };
+  useEffect(() => {
+    const changeBackground = () => {
+      if (window.scrollY > 40) {
+        setNavbar(true);
+      } else {
+        setNavbar(false);
+      }
+    };
 
-  window.addEventListener("scroll", changeBackground);
+    window.addEventListener("scroll", changeBackground);
+
+    return () => window.removeEventListener("scroll", changeBackground);
+  }, [navbar]);
 
   var sectionStyle = {
     backgroundImage: `url(/circle-scatter.svg)`,

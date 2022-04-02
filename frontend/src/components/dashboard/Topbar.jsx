@@ -1,13 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Avatar,
-  Button,
-  IconButton,
-  ListItemIcon,
-  Menu,
-  MenuItem,
-} from "@mui/material";
+import { IconButton, ListItemIcon, Menu, MenuItem } from "@mui/material";
 import { Logout } from "@mui/icons-material";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { UserContext } from "../../UserContext";
@@ -28,12 +21,18 @@ function Topbar() {
 
 const Dropdown = () => {
   const { user, setUser } = useContext(UserContext);
+  const current = JSON.parse(user);
+
   const navigate = useNavigate();
 
   const [anchor, setanchor] = useState(null);
 
   const handleOpen = (e) => {
     setanchor(e.currentTarget);
+  };
+
+  const handleClose = () => {
+    setanchor(null);
   };
 
   const handleMenuClose = (e) => {
@@ -45,25 +44,29 @@ const Dropdown = () => {
   };
 
   const logout = () => {
-    setUser(null);
     localStorage.removeItem("user");
+    setUser(null);
     navigate("/login", { replace: true });
   };
   return (
     <>
+      {/* Bug in this code. Cannot put anchor below IconButton and use onMouseLeave event. */}
       <IconButton
-        onClick={handleOpen}
+        onMouseOver={handleOpen}
         size="small"
         aria-controls="menu"
         aria-haspopup="true"
         className="profile">
-        <Avatar sx={{ width: 40, height: 40 }} />
+        <h3>{current.data.username}</h3>
       </IconButton>
       <Menu
         id="menu"
         anchorEl={anchor}
         open={Boolean(anchor)}
-        onClose={handleMenuClose}>
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={handleMenuClose}
+        MenuListProps={{ onMouseLeave: handleClose }}>
         <MenuItem onClick={profile} sx={{ color: "rgb(114, 88, 223)" }}>
           <ListItemIcon>
             <ManageAccountsIcon fontSize="small" />

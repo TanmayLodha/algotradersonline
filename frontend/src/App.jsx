@@ -15,15 +15,16 @@ function App() {
   //Load the user from storage
   useEffect(() => {
     const u = localStorage.getItem("user");
-    u && JSON.parse(u) ? setUser(true) : setUser(false);
+    u ? setUser(u) : setUser(null);
   }, []);
 
-  // store user in localstorage
-  // everytime user changes
+  // store user in local storage everytime user changes
   useEffect(() => {
-    localStorage.setItem("user", user);
+    if (user) {
+      localStorage.setItem("user", user);
+    }
   }, [user]);
-
+  //[object Object]
   return (
     <UserContext.Provider value={providerValue}>
       <Routes>
