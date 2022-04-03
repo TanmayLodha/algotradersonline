@@ -4,6 +4,7 @@ import { IconButton, ListItemIcon, Menu, MenuItem } from "@mui/material";
 import { Logout } from "@mui/icons-material";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { UserContext } from "../../UserContext";
+import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 
 function Topbar() {
   return (
@@ -51,20 +52,24 @@ const Dropdown = () => {
   return (
     <>
       {/* Bug in this code. Cannot put anchor below IconButton and use onMouseLeave event. */}
-      <IconButton
-        onMouseOver={handleOpen}
-        size="small"
-        aria-controls="menu"
-        aria-haspopup="true"
-        className="profile">
-        <h3>{current.data.username}</h3>
-      </IconButton>
+      <div className="drop">
+        <IconButton
+          onMouseOver={handleOpen}
+          size="small"
+          aria-controls="menu"
+          aria-haspopup="true"
+          className="profile">
+          <h3>{current.data.username}</h3>
+        </IconButton>
+        <ArrowDropDownSharpIcon />
+      </div>
+
       <Menu
         id="menu"
         anchorEl={anchor}
         open={Boolean(anchor)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
         onClose={handleMenuClose}
         MenuListProps={{ onMouseLeave: handleClose }}>
         <MenuItem onClick={profile} sx={{ color: "rgb(114, 88, 223)" }}>

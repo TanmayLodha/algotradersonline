@@ -38,15 +38,24 @@ function Login() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     })
-      .then((data) => data.json())
-      .then((data) => {
-        if (data.token !== null) {
-          setUser(JSON.stringify(data));
-          navigate("/dashboard", { replace: true });
-        } else {
+      .then((response) => {
+        const rejectResponse = {
+          data: {
+            token: null,
+          },
+        };
+        if (response.ok === true) return response.json();
+        else {
           setMsg(msglist[1]);
           setOpen(true);
-          return;
+          return rejectResponse;
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        if (data.data.token !== null) {
+          setUser(JSON.stringify(data));
+          navigate("/dashboard", { replace: true });
         }
       })
       .catch((error) => {

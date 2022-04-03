@@ -10,12 +10,7 @@ function Profile() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [change, setChange] = useState(false);
-
-  const temp_user = {
-    username: "nitishgupta",
-    email: "nitishkgupta@gmail.com",
-    aliceblue: "123456",
-  };
+  const current = JSON.parse(user);
 
   useEffect(() => {
     document.title = "Profile";
@@ -37,19 +32,19 @@ function Profile() {
             <TextField
               disabled
               label="Username"
-              defaultValue={temp_user.username}
+              defaultValue={current.data.username}
               className="user"
             />
             <TextField
               disabled
               label="Aliceblue"
-              defaultValue={temp_user.aliceblue}
+              defaultValue={current.data.aliceBlueID}
               className="user"
             />
             <TextField
               disabled
               label="email"
-              defaultValue={temp_user.email}
+              defaultValue={current.data.email}
               className="user"
             />
 
