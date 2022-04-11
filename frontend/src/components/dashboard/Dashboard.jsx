@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import "./dashboard.scss";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -21,6 +21,22 @@ function Dashboard() {
 
   //security Issue check local.storage
   const current = JSON.parse(user);
+
+  const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login", { replace: true });
+  };
+
+  //Autologout Check again
+  useEffect(() => {
+    console.log(Date.parse(current.data.expiry) - Date.now());
+    if (Date.parse(current.data.expiry) - Date.now() <= 0) {
+      logout();
+    }
+  });
 
   useEffect(() => {
     document.title = "Dashboard";

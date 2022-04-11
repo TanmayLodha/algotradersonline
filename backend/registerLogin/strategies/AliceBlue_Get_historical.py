@@ -32,10 +32,13 @@ def get_historical(instrument, from_datetime, to_datetime, interval, indices=Fal
         records.append(record)
     return records
 
-record = get_historical(alice.get_instrument_by_symbol("NSE", "HDFC"), datetime.now() - timedelta(days= 1,hours=11),datetime.now(),"5_MIN")
 
-for i in record:
-    print(i)
+def func(ticker):
+    record = get_historical(alice.get_instrument_by_symbol("NSE", ticker), datetime.now() - timedelta(days= 5), datetime.now(), "5_MIN")
+    for i in range(0,len(record)):
+        record[i]['date'] = record[i]['date'].replace(microsecond=0).isoformat(' ')
+
+    return record
 
 
 def test (i):
@@ -63,5 +66,3 @@ def test (i):
     op = s2["open"][0]
     # print(vol, op)
     return (vol,op)
-
-test("HDFC")

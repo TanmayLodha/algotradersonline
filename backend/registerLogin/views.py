@@ -1,15 +1,29 @@
-from rest_framework import generics, permissions,status
+from rest_framework import generics, permissions,status,views
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer
+from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer,HistoricalSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
 from .strategies import AliceBlue_Get_historical
+from rest_framework.decorators import api_view
+import sys
 
 
+@api_view(['POST'])
+def histo(request):
+    ticker = request.data["ticker"]
+    # ticker = "HDFC"
+    record = AliceBlue_Get_historical.func(ticker)
+    serializer_class = HistoricalSerializer(record,many=True)
+    return Response(serializer_class.data)
 
+
+# @api_view(['GET'])
+# def strategy(request):
+#     script_path = os.path.join(settings.BASE_DIR, '/Code/zenet/zenet/workers/stats_scraper.py')
+#     subprocess.call([sys.executable, script_path])
 
 
 class RegisterAPI(generics.GenericAPIView):

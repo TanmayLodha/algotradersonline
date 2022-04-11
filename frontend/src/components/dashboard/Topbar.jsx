@@ -53,15 +53,14 @@ const Dropdown = () => {
     <>
       {/* Bug in this code. Cannot put anchor below IconButton and use onMouseLeave event. */}
       <div className="drop">
-        <IconButton
+        <h2>{current.data.username}</h2>
+
+        <ArrowDropDownSharpIcon
           onMouseOver={handleOpen}
           size="small"
           aria-controls="menu"
           aria-haspopup="true"
-          className="profile">
-          <h3>{current.data.username}</h3>
-        </IconButton>
-        <ArrowDropDownSharpIcon />
+        />
       </div>
 
       <Menu

@@ -1,10 +1,8 @@
-import { Button, TextField } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import React, { useContext, useState, useEffect } from "react";
 import { UserContext } from "../../UserContext";
 import "./profile.scss";
 import { useNavigate } from "react-router-dom";
-import ErrorIcon from "@mui/icons-material/Error";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 function Profile() {
   const { user, setUser } = useContext(UserContext);
@@ -27,31 +25,36 @@ function Profile() {
       </div>
       <div className="bottom">
         <div className="card">
-          <h3>Profile</h3>
-          <div className="contents">
-            <TextField
-              disabled
-              label="Username"
-              defaultValue={current.data.username}
-              className="user"
-            />
-            <TextField
-              disabled
-              label="Aliceblue"
-              defaultValue={current.data.aliceBlueID}
-              className="user"
-            />
-            <TextField
-              disabled
-              label="email"
-              defaultValue={current.data.email}
-              className="user"
-            />
-
-            {change && <ChangePassword />}
+          <h2>Profile</h2>
+          <hr />
+          <div className="ava">
+            <Avatar
+              sx={{
+                width: 60,
+                height: 60,
+                bgcolor: "rgb(239, 237, 255)",
+                color: "rgb(114, 88, 223)",
+                fontSize: 35,
+              }}>
+              {current.data.username[0].toUpperCase()}
+            </Avatar>
           </div>
 
-          <div className="buttons">
+          <div className="data">
+            <h4> Username</h4>
+            <h3>{current.data.username}</h3>
+          </div>
+
+          <div className="data">
+            <h4>AliceBlueID</h4>
+            <h3>{current.data.aliceBlueID}</h3>
+          </div>
+
+          <div className="data">
+            <h4>Email</h4>
+            <h3>{current.data.email}</h3>
+          </div>
+          <div className="button">
             <Button
               disabled={change ? true : false}
               className="in-btn"
@@ -60,55 +63,11 @@ function Profile() {
               }}>
               Go to dashboard
             </Button>
-            <Button className="in-btn" onClick={() => setChange(!change)}>
-              {change ? "Save" : "Change Password"}
-            </Button>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-const ChangePassword = () => {
-  const [passerror, setPasserror] = useState(false);
-  const [password, setPassword] = useState("");
-  const [c_password, setCPassword] = useState("");
-
-  const validatePassword = (e) => {
-    setCPassword(e.target.value);
-    if (e.target.value !== password) {
-      setPasserror(true);
-    } else {
-      setPasserror(false);
-    }
-  };
-  return (
-    <div className="pass">
-      <TextField
-        name="password"
-        required
-        label="Password"
-        type="password"
-        className="user"
-        autoComplete="off"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <TextField
-        name="confirm_password"
-        required
-        label="Confirm Password"
-        type="password"
-        className="user"
-        autoComplete="off"
-        value={c_password}
-        onChange={validatePassword}
-      />
-      {passerror && <ErrorIcon className="error" />}
-      {c_password && !passerror && <CheckCircleIcon className="success" />}
-    </div>
-  );
-};
 
 export default Profile;

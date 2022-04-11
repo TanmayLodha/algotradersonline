@@ -1,3 +1,5 @@
+from abc import ABC
+
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import CustomUser
@@ -8,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'aliceBlueID')
+
 
 # Register Serializer
 class RegisterSerializer(serializers.ModelSerializer):
@@ -23,9 +26,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class ChangePasswordSerializer(serializers.Serializer):
     model = User
-
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
+
+class HistoricalSerializer(serializers.Serializer):
+    date = serializers.CharField()
+    open = serializers.FloatField()
+    high = serializers.FloatField()
+    low = serializers.FloatField()
+    close = serializers.FloatField()
+    volume = serializers.IntegerField()
+
+
+
+
+
 
 
 
