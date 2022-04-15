@@ -66,3 +66,6 @@ def test (i):
     op = s2["open"][0]
     # print(vol, op)
     return (vol,op)
+
+
+

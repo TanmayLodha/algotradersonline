@@ -1,7 +1,4 @@
-from abc import ABC
-
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from .models import CustomUser
 
 
@@ -24,19 +21,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class ChangePasswordSerializer(serializers.Serializer):
-    model = User
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
 
-
-class HistoricalSerializer(serializers.Serializer):
-    date = serializers.CharField()
-    open = serializers.FloatField()
-    high = serializers.FloatField()
-    low = serializers.FloatField()
-    close = serializers.FloatField()
-    volume = serializers.IntegerField()
 
 
 
