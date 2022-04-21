@@ -6,24 +6,42 @@ import dateutil.parser
 from datetime import datetime, timedelta
 import pandas as pd
 import pandasql as ps
-import xlwings as xw
+from config import Credentials
 
-colnum = 2
-username = "411686"
-password = "kaku4567"
-app_id = "SX5Vs0UiCE"
-api_secret = "NfL6k8K82kryxfAusAtUOsLUdJzSY7TjrHvMmrsO22WHiRTOuc4QCKGMw27C1uly"
-twoFA = "1979"
-
-access_token = AliceBlue.login_and_get_access_token(username=username, password=password, twoFA=twoFA,
-                                                    api_secret=api_secret, app_id=app_id)
-alice = AliceBlue(username=username, password=password, access_token=access_token)
-traded_stocks = []
+name = ""
+openx = 0
+high = 0
+low = 0
+close = 0
+ltp = 0
+volume = 0
+alice = None
 socket_opened = False
 
-wb = xw.Book('new.xlsx')
-sheet = wb.sheets['Sheet1']
-sheet.range("A2:E300").clear_contents()
+instrument_list=['ACC', 'AUBANK', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE',
+ 'BATAINDIA', 'BHARATFORG', 'BPCL', 'BHARTIARTL', 'BIOCON', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE', 'DLF', 'DABUR', 'DIVISLAB',
+ 'DRREDDY', 'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HCLTECH', 'HDFCBANK', 'HDFCLIFE', 'HAVELLS', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
+ 'HINDUNILVR', 'HDFC', 'ICICIBANK', 'ICICIPRULI', 'ITC', 'IRCTC', 'IGL', 'INDUSINDBK', 'INFY', 'INDIGO', 'JSWSTEEL', 'JINDALSTEL', 'JUBLFOOD', 'KOTAKBANK',
+ 'LICHSGFIN', 'LTI', 'LT', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI','MINDTREE', 'MUTHOOTFIN', 'PVR', 'PIDILITIND', 'PEL', 'RELIANCE', 'SBICARD', 'SBILIFE',
+ 'SRF', 'SRTRANSFIN', 'SBIN', 'SUNPHARMA', 'TVSMOTOR', 'TATACHEM', 'TCS', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER', 'TATASTEEL', 'TECHM',  'TITAN',
+ 'UPL', 'VEDL', 'VOLTAS', 'WIPRO', 'ZEEL']
+
+
+def event_handler_quote_update(message):
+    global name, openx, high, low, close, ltp, volume
+    name = message['instrument'].symbol
+    openx = message['open']
+    high = message['high']
+    low = message['low']
+    close = message['close']
+    ltp = message['ltp']
+    volume = message['volume']
+
+
+def open_callback():
+    global socket_opened
+    socket_opened = True
+
 
 def get_historical(instrument, from_datetime, to_datetime, interval, indices=False):
     params = {"token": instrument.token,
@@ -41,160 +59,113 @@ def get_historical(instrument, from_datetime, to_datetime, interval, indices=Fal
     return records
 
 
-def func(ticker):
-    record = get_historical(alice.get_instrument_by_symbol("NSE", ticker), datetime.now() - timedelta(days= 5), datetime.now(), "5_MIN")
-    for i in range(0,len(record)):
-        record[i]['date'] = record[i]['date'].replace(microsecond=0).isoformat(' ')
-
-    return record
-
-
 def test(i):
     instrument = alice.get_instrument_by_symbol("NSE", i)
-    from_datetime = datetime.now() - timedelta(days= 1) ##[ON Monday Value Need to change to 4]
-    to_datetime = datetime.now() - timedelta(days= 0)   ##[ON Monday Value Need to change to 3]
-    interval1 = "5_MIN"   # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
-    interval2 = "DAY"   # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
+    from_datetime = datetime.now() - timedelta(days= 1)
+    to_datetime = datetime.now() - timedelta(days= 0)
+    interval1 = "5_MIN"
+    interval2 = "DAY"
     indices = False
     df1 = pd.DataFrame(get_historical(instrument, from_datetime, to_datetime, interval1, indices))
-    # df1.index = df1["volume"]
-    # df1 = df1.drop("volume", axis=1)
-
     df2 = pd.DataFrame(get_historical(instrument, from_datetime, to_datetime, interval2, indices))
-    # df2.index = df2["date"]
-    # df2 = df2.drop("date", axis=1)
-    # print(df1)
     q1 = """SELECT  volume FROM df1 order by volume DESC LIMIT 1 """
     q2 = """SELECT  open FROM df2 """
-    #print (i)
     s1= ps.sqldf(q1, locals())
     s2= ps.sqldf(q2, locals())
-
     vol= s1["volume"][0]
     op = s2["open"][0]
-    # print(vol, op)
     return (vol,op)
 
 
-def event_handler_quote_update(message):
-    print(f"quote update {message}")
-    global colnum
-    name = message['instrument'].symbol
-    openx = message['open']
-    high = message['high']
-    low = message['low']
-    close = message['close']
-    ltp = message['ltp']
-    volume = message['volume']
-    buy_qty=message['total_buy_quantity']
-    sell_qty=message['total_sell_quantity']
-    curr_time=datetime.datetime.now()
-    crt_time=curr_time.time()
-    breakout=datetime.time()
-    v = test(name)
-    c_low= close + close*0.03
-    c_high= close - close*0.03
-    range_HL1=high - low
-    range_OC1=openx -ltp
-    range_HL2=high - low
-    range_OC2=ltp - openx
-    L1=low - low*0.1/100
-    H1=high + high*0.1/100
-    money = 100000
-    quantity_b = int(money/H1)
-    quantity_s = int(money/L1)
-    p_open= v[1]*0.06
-    p_diff_b=p_open + v[1]
-    p_diff_s=v[1] - p_open
-    vy=round (v[0] + v[0]*0.0075)
-
-    print(name, v[0], vy, v[1])
+def buy_signal(name):
+    global alice
+    alice.place_order(transaction_type = TransactionType.Buy,
+                         instrument = alice.get_instrument_by_symbol('NSE', name),
+                         quantity = 1,
+                         order_type = OrderType.Market,
+                         product_type = ProductType.Intraday,
+                         price = 0.0,
+                         trigger_price = None,
+                         stop_loss = None,
+                         square_off = None,
+                         trailing_sl = None,
+                         is_amo = False)
 
 
-    if ( (name not in traded_stocks) and (openx < p_diff_b) and (ltp < c_low) and (volume > vy) and (range_OC2 > range_HL2*0.80 )):
-        ##"""print(f"quote update {message}")"""
-        print(f"buy: {name} , H1: {H1} , ltp: {ltp}")
-        traded_stocks.append(name)
-
-        a = 'A' + str(colnum)
-        wb = xw.Book('new.xlsx')
-        sheet = wb.sheets['Sheet1']
-        sheet.range(a).expand().value = [name, "BUY", quantity_b, H1]
-        colnum += 1
-
-        alice.place_order(transaction_type=TransactionType.Buy,
-                          instrument=alice.get_instrument_by_symbol('NSE', name),
-                          quantity=quantity_b,
-                          order_type=OrderType.Market,
-                          product_type=ProductType.Delivery,
-                          # price=0.0,
-                          trigger_price=None,
-                          stop_loss=None,
-                          square_off=None,
-                          trailing_sl=None,
-                          is_amo=False)
+def sell_signal(name):
+    global alice
+    alice.place_order(transaction_type = TransactionType.Sell,
+                         instrument = alice.get_instrument_by_symbol('NSE', name),
+                         quantity = 1,
+                         order_type = OrderType.Market,
+                         product_type = ProductType.Intraday,
+                         price = 0.0,
+                         trigger_price = None,
+                         stop_loss = None,
+                         square_off = None,
+                         trailing_sl = None,
+                         is_amo = False)
 
 
-    if ( (name not in traded_stocks) and (openx > p_diff_s) and (ltp > c_high) and (volume > vy) and (range_OC1 > range_HL1*0.80 )):
-        #"""print(f"quote update {message}")"""
-        print(f"sell: {name} , L1: {L1} , ltp: {ltp}")
-        traded_stocks.append(name)
-
-        a = 'A' + str(colnum)
-        wb = xw.Book('new.xlsx')
-        sheet = wb.sheets['Sheet1']
-        sheet.range(a).expand().value = [name, "SELL", quantity_s, "", L1]
-        colnum += 1
-
-        alice.place_order(transaction_type=TransactionType.Sell,
-                          instrument=alice.get_instrument_by_symbol('NSE', name),
-                          quantity=quantity_s,
-                          order_type=OrderType.Market,
-                          product_type=ProductType.Delivery,
-                          # price=0.0,
-                          trigger_price=None,
-                          stop_loss=None,
-                          square_off=None,
-                          trailing_sl=None,
-                          is_amo=False)
-
-
-def open_callback():
+def main():
+    global alice
     global socket_opened
-    socket_opened = True
-
-
-def on_disconnect(*args, **kwargs):
-    global socket_opened
+    access_token = AliceBlue.login_and_get_access_token(username=Credentials.UserName.value, password=Credentials.PassWord.value, twoFA=Credentials.TwoFA.value,
+                                                        api_secret=Credentials.SecretKey.valuw, app_id=Credentials.AppId.value)
+    alice = AliceBlue(username=username, password=password, access_token=access_token)
+    traded_stocks = []
     socket_opened = False
-    msg = "error: in on_disconnect args=%s, kwargs=%s" % (args, kwargs)
-    print(msg)
-    return
-
-
-def mainfunc():
 
     alice.start_websocket(subscribe_callback=event_handler_quote_update,
-                        socket_open_callback=open_callback,
-                        # socket_close_callback=on_disconnect,
-                        run_in_background=True)
-    while(socket_opened==False):
+                          socket_open_callback=open_callback,
+                          run_in_background=True)
+    print(socket_opened)
+    while (socket_opened == False):
         pass
+    print(socket_opened)
     live_data = {}
 
-    instrument_list=['ACC', 'AUBANK', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE',
-     'BATAINDIA', 'BHARATFORG', 'BPCL', 'BHARTIARTL', 'BIOCON', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE', 'DLF', 'DABUR', 'DIVISLAB',
-     'DRREDDY', 'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HCLTECH', 'HDFCBANK', 'HDFCLIFE', 'HAVELLS', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
-     'HINDUNILVR', 'HDFC', 'ICICIBANK', 'ICICIPRULI', 'ITC', 'IRCTC', 'IGL', 'INDUSINDBK', 'INFY', 'INDIGO', 'JSWSTEEL', 'JINDALSTEL', 'JUBLFOOD', 'KOTAKBANK',
-     'LICHSGFIN', 'LTI', 'LT', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI','MINDTREE', 'MUTHOOTFIN', 'PVR', 'PIDILITIND', 'PEL', 'RELIANCE', 'SBICARD', 'SBILIFE',
-     'SRF', 'SRTRANSFIN', 'SBIN', 'SUNPHARMA', 'TVSMOTOR', 'TATACHEM', 'TCS', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER', 'TATASTEEL', 'TECHM',  'TITAN',
-     'UPL', 'VEDL', 'VOLTAS', 'WIPRO', 'ZEEL']
-
-
-    alice.subscribe([alice.get_instrument_by_symbol('NSE', i.upper()) for i in instrument_list], LiveFeedType.MARKET_DATA)
+    alice.subscribe([alice.get_instrument_by_symbol('NSE', i.upper()) for i in instrument_list],
+                    LiveFeedType.MARKET_DATA)
 
     while len(instrument_list) != len(list(live_data.keys())):
         sleep(1)
 
+    # curr_time = datetime.datetime.now()
+    v = test(name)
+    c_low = close + close * 0.03
+    c_high = close - close * 0.03
+    range_HL1 = high - low
+    range_OC1 = openx - ltp
+    range_HL2 = high - low
+    range_OC2 = ltp - openx
+    L1 = low - low * 0.1 / 100
+    H1 = high + high * 0.1 / 100
+    # money = 100000
+    # quantity_b = int(money / H1)
+    # quantity_s = int(money / L1)
+    p_open = v[1] * 0.06
+    p_diff_b = p_open + v[1]
+    p_diff_s = v[1] - p_open
+    vy = round(v[0] + v[0] * 0.0075)
+    print(name, v[0], vy, v[1])
 
-mainfunc()
+    if ((name not in traded_stocks) and (openx < p_diff_b) and (ltp < c_low) and (volume > vy) and (
+            range_OC2 > range_HL2 * 0.80)):
+        print(f"buy: {name} , H1: {H1} , ltp: {ltp}")
+        traded_stocks.append(name)
+        buy_signal(name)
+
+    if ((name not in traded_stocks) and (openx > p_diff_s) and (ltp > c_high) and (volume > vy) and (
+            range_OC1 > range_HL1 * 0.80)):
+        print(f"sell: {name} , L1: {L1} , ltp: {ltp}")
+        traded_stocks.append(name)
+        sell_signal(name)
+
+
+
+
+
+
+
+
