@@ -52,15 +52,15 @@ const Dropdown = () => {
   return (
     <>
       {/* Bug in this code. Cannot put anchor below IconButton and use onMouseLeave event. */}
-      <div className="drop">
+      <div
+        className="drop"
+        onMouseOver={handleOpen}
+        size="small"
+        aria-controls="menu"
+        aria-haspopup="true">
         <h2>{current.data.username}</h2>
 
-        <ArrowDropDownSharpIcon
-          onMouseOver={handleOpen}
-          size="small"
-          aria-controls="menu"
-          aria-haspopup="true"
-        />
+        <ArrowDropDownSharpIcon />
       </div>
 
       <Menu
@@ -70,7 +70,12 @@ const Dropdown = () => {
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         onClose={handleMenuClose}
-        MenuListProps={{ onMouseLeave: handleClose }}>
+        MenuListProps={{ onMouseLeave: handleClose }}
+        PaperProps={{
+          style: {
+            width: 175,
+          },
+        }}>
         <MenuItem onClick={profile} sx={{ color: "rgb(114, 88, 223)" }}>
           <ListItemIcon>
             <ManageAccountsIcon fontSize="small" />

@@ -6,8 +6,9 @@ import dateutil.parser
 from datetime import datetime, timedelta
 import pandas as pd
 import pandasql as ps
-from config import Credentials
+from .config import Credentials
 
+# Global Values
 name = ""
 openx = 0
 high = 0
@@ -18,7 +19,7 @@ volume = 0
 alice = None
 socket_opened = False
 
-instrument_list=['ACC', 'AUBANK', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE',
+instrument_list = ['ACC', 'AUBANK', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE',
  'BATAINDIA', 'BHARATFORG', 'BPCL', 'BHARTIARTL', 'BIOCON', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE', 'DLF', 'DABUR', 'DIVISLAB',
  'DRREDDY', 'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HCLTECH', 'HDFCBANK', 'HDFCLIFE', 'HAVELLS', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
  'HINDUNILVR', 'HDFC', 'ICICIBANK', 'ICICIPRULI', 'ITC', 'IRCTC', 'IGL', 'INDUSINDBK', 'INFY', 'INDIGO', 'JSWSTEEL', 'JINDALSTEL', 'JUBLFOOD', 'KOTAKBANK',
@@ -70,9 +71,9 @@ def test(i):
     df2 = pd.DataFrame(get_historical(instrument, from_datetime, to_datetime, interval2, indices))
     q1 = """SELECT  volume FROM df1 order by volume DESC LIMIT 1 """
     q2 = """SELECT  open FROM df2 """
-    s1= ps.sqldf(q1, locals())
-    s2= ps.sqldf(q2, locals())
-    vol= s1["volume"][0]
+    s1 = ps.sqldf(q1, locals())
+    s2 = ps.sqldf(q2, locals())
+    vol = s1["volume"][0]
     op = s2["open"][0]
     return (vol,op)
 
@@ -111,18 +112,18 @@ def main():
     global alice
     global socket_opened
     access_token = AliceBlue.login_and_get_access_token(username=Credentials.UserName.value, password=Credentials.PassWord.value, twoFA=Credentials.TwoFA.value,
-                                                        api_secret=Credentials.SecretKey.valuw, app_id=Credentials.AppId.value)
-    alice = AliceBlue(username=username, password=password, access_token=access_token)
+                                                        api_secret=Credentials.SecretKey.value, app_id=Credentials.AppId.value)
+    alice = AliceBlue(username=Credentials.UserName.value, password=Credentials.PassWord.value, access_token=access_token)
     traded_stocks = []
     socket_opened = False
 
     alice.start_websocket(subscribe_callback=event_handler_quote_update,
                           socket_open_callback=open_callback,
                           run_in_background=True)
-    print(socket_opened)
+
     while (socket_opened == False):
         pass
-    print(socket_opened)
+
     live_data = {}
 
     alice.subscribe([alice.get_instrument_by_symbol('NSE', i.upper()) for i in instrument_list],
