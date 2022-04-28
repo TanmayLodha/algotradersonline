@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import "./dashboard.scss";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -19,11 +25,13 @@ function Dashboard() {
   const { user, setUser } = useContext(UserContext);
   const [open, setOpen] = useState(false);
 
+  //Welcome Message check
+  const { state } = useLocation();
+
   //security Issue check local.storage
   const current = JSON.parse(user);
 
   const navigate = useNavigate();
-
   const logout = () => {
     localStorage.removeItem("user");
     setUser(null);
@@ -32,7 +40,6 @@ function Dashboard() {
 
   //Autologout Check again
   useEffect(() => {
-    console.log(Date.parse(current.data.expiry) - Date.now());
     if (Date.parse(current.data.expiry) - Date.now() <= 0) {
       logout();
     }
@@ -52,16 +59,19 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-      <Snackbar
-        open={open}
-        autoHideDuration={2000}
-        onClose={snackBarClose}
-        TransitionComponent={SlideTransition}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-        <Alert severity="success" variant="filled">
-          {"Welcome " + current.data.username}
-        </Alert>
-      </Snackbar>
+      {state && (
+        <Snackbar
+          open={open}
+          autoHideDuration={2000}
+          onClose={snackBarClose}
+          TransitionComponent={SlideTransition}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+          <Alert severity="success" variant="filled">
+            {"Welcome " + current.data.username}
+          </Alert>
+        </Snackbar>
+      )}
+
       <div className="left">
         <Sidebar />
       </div>
@@ -80,5 +90,9 @@ function Dashboard() {
     </div>
   );
 }
+
+Dashboard.defaultProps = {
+  value: false,
+};
 
 export default Dashboard;

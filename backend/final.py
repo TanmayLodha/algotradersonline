@@ -3,7 +3,6 @@ import datetime
 import statistics
 from time import sleep
 from alice_blue import *
-import sys
 
 # Config
 username = "411686"
@@ -103,5 +102,3 @@ def main():
     #                     current_signal = 'sell'
     #         sleep(1)
     #     sleep(0.2)  # sleep for 200ms
-    sys.exit()
-

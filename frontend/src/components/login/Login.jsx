@@ -52,10 +52,12 @@ function Login() {
         }
       })
       .then((data) => {
-        console.log(data);
         if (data.data.token !== null) {
           setUser(JSON.stringify(data));
-          navigate("/dashboard", { replace: true });
+          navigate("/dashboard/portfolio", {
+            replace: true,
+            state: { firstLogin: true },
+          });
         }
       })
       .catch((error) => {

@@ -2,10 +2,23 @@
 
 .main-s {
   position: absolute;
-  // height: 100vh;
   width: 92vw;
   margin: 0;
   padding: 30px;
+
+  .strat-card {
+    width: 300px;
+    height: 250px;
+    margin: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+
+    .in-btn {
+      position: absolute;
+      margin-bottom: 10px;
+      bottom: 0;
+    }
+  }
 
   .stratergy {
     padding: 10px;
@@ -23,7 +36,7 @@
         background-color: $mainColor;
         color: $alternateColor;
         position: absolute;
-        margin-bottom: 10px;
+        margin: 10px;
         bottom: 0;
 
         &:hover {
@@ -31,6 +44,15 @@
           color: white;
         }
       }
+
+      .stop {
+        margin: 10px;
+        right: 0;
+      }
+    }
+
+    .backdrop {
+      width: 500px;
     }
   }
 }
