@@ -2,6 +2,7 @@
 
 # dependencies
 /backend/.idea
+/backend/secret_key.txt
 **/venv
 /frontend/node_modules
 /frontend/.pnp
