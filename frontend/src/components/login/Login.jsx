@@ -33,7 +33,7 @@ function Login() {
       return;
     }
     const credentials = { username: username, password: password };
-    fetch("http://127.0.0.1:8000/api/login/", {
+    fetch("http://172.22.2.67:8000/api/login/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),

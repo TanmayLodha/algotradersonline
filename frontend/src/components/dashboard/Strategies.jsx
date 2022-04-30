@@ -22,7 +22,7 @@ function Strategies() {
   };
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/strategies/", {
+    fetch("http://172.22.2.67:8000/api/strategies/", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -94,6 +94,7 @@ const StrategiesCard = ({ props }) => {
   };
 
   const [open, setOpen] = useState(false);
+  const [id, setId] = useState(null);
 
   const snackBarClose = () => {
     setOpen(false);
@@ -101,9 +102,10 @@ const StrategiesCard = ({ props }) => {
 
   const handleOpen = () => {
     setOpen(true);
-    // execute();
+    // setId(props.id);
+    execute();
   };
-
+  console.log(id);
   return (
     <>
       <Snackbar
@@ -126,7 +128,7 @@ const StrategiesCard = ({ props }) => {
             Execute
           </Button>
           {open && (
-            <Button className="in-btn stop" onClick={handleOpen}>
+            <Button className="in-btn stop" onClick={snackBarClose}>
               STOP
             </Button>
           )}
