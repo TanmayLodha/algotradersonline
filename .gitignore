@@ -3,6 +3,7 @@
 # dependencies
 /backend/.idea
 /backend/secret_key.txt
+/backend/__pycache__/
 **/venv
 /frontend/node_modules
 /frontend/.pnp
