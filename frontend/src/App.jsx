@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./components/landing/Landing";
+import Dashboard from "./components/dashboard/Dashboard";
+import { UserContext } from "./UserContext";
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
-import Dashboard from "./components/dashboard/Dashboard";
-import Strategies from "./components/dashboard/Strategies";
-import { UserContext } from "./UserContext";
-import Profile from "./components/dashboard/Profile";
+import Toc from "./components/toc/Toc";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -30,14 +29,17 @@ function App() {
       <Routes>
         {!user && (
           <>
-            <Route path="/*" element={<Landing />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="terms" element={<Toc />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </>
         )}
 
         {user && (
           <>
             <Route path="/dashboard/*" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
           </>
         )}
 

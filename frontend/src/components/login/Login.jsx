@@ -66,8 +66,11 @@ function Login() {
       });
   };
 
+  var sectionStyle = {
+    backgroundImage: `url(/stacked-waves.svg)`,
+  };
   return (
-    <div className="main">
+    <div className="main" style={sectionStyle}>
       <Snackbar
         open={open}
         autoHideDuration={5000}

@@ -104,8 +104,12 @@ const Register = () => {
       });
   };
 
+  var sectionStyle = {
+    backgroundImage: `url(/layered-waves.svg)`,
+  };
+
   return (
-    <div className="main-register">
+    <div className="main-register" style={sectionStyle}>
       <Snackbar
         open={open}
         autoHideDuration={5000}

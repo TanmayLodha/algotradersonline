@@ -5,12 +5,14 @@ import {
   Table,
   TableHead,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import "./portfolio.scss";
 
-// const createData
-
 function Portfolio() {
+  useEffect(() => {
+    document.title = "Dashboard";
+  }, []);
+
   return (
     <div className="portfolio">
       <h1>Today's Summary</h1>

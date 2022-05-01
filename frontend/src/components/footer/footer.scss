@@ -27,7 +27,7 @@
       bottom: 0;
       font-size: 12px;
 
-      a {
+      .a {
         text-decoration: underline dotted;
         opacity: 0.5;
         color: $alternateColor;
@@ -46,7 +46,6 @@
 
     border-left: 5px $alternateColor;
 
-    .phone,
     .email,
     .address {
       margin: 5px;

@@ -3,68 +3,48 @@
 .profile {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  display: flex;
-  flex-direction: column;
 
-  .above {
-    height: 70px;
-    width: 100vw;
-    padding-left: 20px;
-  }
-
-  .bottom {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
+  .card {
+    width: 40vw;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    padding: 25px;
+    color: black;
 
-    .card {
-      width: 40vw;
-      border-radius: 5px;
-      background-color: white;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    .ava {
       display: flex;
-      flex-direction: column;
-      padding: 25px;
+      justify-content: center;
+    }
 
-      .ava {
-        display: flex;
-        justify-content: center;
+    .data {
+      display: flex;
+      justify-content: space-between;
+
+      h4 {
+        opacity: 0.7;
       }
+    }
 
-      .data {
-        display: flex;
-        justify-content: space-between;
+    h2 {
+      text-align: center;
+    }
 
-        h4 {
-          opacity: 0.7;
-        }
-      }
+    .button {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      .in-btn {
+        height: 50px;
+        width: 200px;
+        background-color: $mainColor;
+        color: $alternateColor;
 
-      h2 {
-        text-align: center;
-      }
-
-      .button {
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-        .in-btn {
-          height: 50px;
-          width: 200px;
-          background-color: $mainColor;
-          color: $alternateColor;
-
-          &:hover {
-            background-color: $alternateColor;
-            color: $mainColor;
-          }
+        &:hover {
+          background-color: $alternateColor;
+          color: $mainColor;
         }
       }
     }

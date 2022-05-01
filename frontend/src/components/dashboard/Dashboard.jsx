@@ -16,6 +16,7 @@ import { UserContext } from "../../UserContext";
 import { Snackbar } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Slide from "@mui/material/Slide";
+import Profile from "./Profile";
 
 function SlideTransition(props) {
   return <Slide {...props} direction="down" />;
@@ -83,6 +84,8 @@ function Dashboard() {
             <Route path="strategies" element={<Strategies />} />
             <Route path="paperTrade" element={<PaperTrade />} />
             <Route path="portfolio" element={<Portfolio />} />
+            <Route path="profile" element={<Profile />} />
+
             <Route path="*" element={<Navigate to="portfolio" />} />
           </Routes>
         </div>

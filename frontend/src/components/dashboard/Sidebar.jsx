@@ -5,7 +5,6 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
 import { Link } from "react-router-dom";
-import { List, ListItem } from "@mui/material";
 
 function Sidebar() {
   const CustomTooltip = styled(({ className, ...props }) => (

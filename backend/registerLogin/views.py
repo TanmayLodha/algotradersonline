@@ -4,12 +4,15 @@ from knox.models import AuthToken
 from .serializers import UserSerializer, RegisterSerializer
 from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from knox.views import LoginView as KnoxLoginView
 
 
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
-
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { IconButton, ListItemIcon, Menu, MenuItem } from "@mui/material";
+import { ListItemIcon, Menu, MenuItem } from "@mui/material";
 import { Logout } from "@mui/icons-material";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { UserContext } from "../../UserContext";
@@ -41,7 +41,7 @@ const Dropdown = () => {
   };
 
   const profile = () => {
-    navigate("/profile");
+    navigate("/dashboard/profile");
   };
 
   const logout = () => {

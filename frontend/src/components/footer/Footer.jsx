@@ -1,11 +1,11 @@
 import React from "react";
-import CallIcon from "@mui/icons-material/Call";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EmailIcon from "@mui/icons-material/Email";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
 
 import "./footer.scss";
+import { Link } from "react-router-dom";
 
 function Footer() {
   const CustomTooltip = styled(({ className, ...props }) => (
@@ -26,19 +26,14 @@ function Footer() {
         <p>Automate your trade with us</p>
 
         <div className="legal">
-          <a href="#">Terms and Conditions</a>
+          <Link to="terms" className="a">
+            Terms and Conditions
+          </Link>
+
           <p> &copy; All rights reserved</p>
         </div>
       </div>
       <div className="right">
-        <div className="phone">
-          <CustomTooltip title="Phone" placement="top">
-            <a href="tel:+919549409336">
-              <CallIcon />
-            </a>
-          </CustomTooltip>
-        </div>
-
         <div className="email">
           <CustomTooltip title="Mail" placement="top">
             <a href="mailto:19ucc131@lnmiit.ac.in">
