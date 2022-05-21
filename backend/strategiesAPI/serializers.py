@@ -1,10 +1,18 @@
 from rest_framework import serializers
-from .models import Strategies
+from .models import Strategies, Credentials
+from registerLogin.models import CustomUser
 
 
 class StrategiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Strategies
-        fields = '__all__'
-        fields = ('id','name')
+        fields = ('id', 'name')
 
+
+class CredentialSerializer(serializers.ModelSerializer):
+    userName = serializers.SlugRelatedField(many=False, read_only=False, slug_field='username',
+                                            queryset=CustomUser.objects.all())
+
+    class Meta:
+        model = Credentials
+        fields = '__all__'

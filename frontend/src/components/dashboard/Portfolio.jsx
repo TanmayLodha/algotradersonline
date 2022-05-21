@@ -5,13 +5,21 @@ import {
   Table,
   TableHead,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./portfolio.scss";
 
 function Portfolio() {
   useEffect(() => {
     document.title = "Dashboard";
   }, []);
+  const [range, setRange] = useState(false);
+  let now = new Date();
+  const start = "09:15:00";
+  const end = "15:30:00";
+
+  if (now.getTime >= start && now.getTime <= end) {
+    setRange(true);
+  }
 
   return (
     <div className="portfolio">
@@ -35,6 +43,11 @@ function Portfolio() {
           </Table>
         </TableContainer>
       </div>
+      {range ? (
+        <h2>Summary will be available after market closes.</h2>
+      ) : (
+        <h2>No trades made today.</h2>
+      )}
     </div>
   );
 }

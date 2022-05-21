@@ -19,7 +19,7 @@ function Profile() {
       <Backdrop
         sx={{
           color: "#fff",
-          backdropFilter: "blur(5px)",
+          backdropFilter: "blur(1px)",
           zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
         open={true}>
