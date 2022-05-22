@@ -12,5 +12,5 @@ class StratergiesAdmin(admin.ModelAdmin):
 
 @admin.register(Credentials)
 class CredentialAdmin(admin.ModelAdmin):
-    list_display = ('id','userName')
+    list_display = ['userName']
 

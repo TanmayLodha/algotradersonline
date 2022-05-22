@@ -17,7 +17,7 @@ class Strategies(models.Model):
 
 
 class Credentials(models.Model):
-    userName = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    userName = models.OneToOneField(CustomUser,on_delete=models.CASCADE, primary_key=True)
     twoFA = models.CharField(max_length=4)
     password = models.CharField(max_length=50)
     api_key = models.CharField(max_length=100)

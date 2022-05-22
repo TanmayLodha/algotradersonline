@@ -6,7 +6,6 @@ import dateutil.parser
 from datetime import datetime, timedelta
 import pandas as pd
 import pandasql as ps
-from .config import Credentials
 
 # Global Values
 name = ""
@@ -111,9 +110,9 @@ def sell_signal(name):
 def main():
     global alice
     global socket_opened
-    access_token = AliceBlue.login_and_get_access_token(username=Credentials.UserName.value, password=Credentials.PassWord.value, twoFA=Credentials.TwoFA.value,
-                                                        api_secret=Credentials.SecretKey.value, app_id=Credentials.AppId.value)
-    alice = AliceBlue(username=Credentials.UserName.value, password=Credentials.PassWord.value, access_token=access_token)
+    access_token = AliceBlue.login_and_get_access_token(username=username, password=password, twoFA=twoFA,
+                                                        api_secret=api_secret, app_id=app_id)
+    alice = AliceBlue(username=username, password=password, access_token=access_token)
     traded_stocks = []
     socket_opened = False
 
