@@ -54,6 +54,8 @@ def executeStrategy(request):
     mod = importlib.import_module(file)
     t = threading.Thread(target=mod.main, daemon=True)
     t.start()
+    for thread in threading.enumerate():
+        print(thread.name)
     return Response({"response": "Strategy Executed!"}, status=status.HTTP_200_OK)
 
 

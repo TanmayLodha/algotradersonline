@@ -1,9 +1,9 @@
 # config
-username = "411686"
-password = "kaku4567"
-app_id = "SX5Vs0UiCE"
-api_secret = "NfL6k8K82kryxfAusAtUOsLUdJzSY7TjrHvMmrsO22WHiRTOuc4QCKGMw27C1uly"
-twoFA = "1979"
+username = "1"
+password = "123"
+app_id = "NAGPAL"
+api_secret = "SEXY"
+twoFA = "69"
 
 from time import sleep
 import datetime

@@ -9,7 +9,7 @@ import {
 import "./dashboard.scss";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import Strategies from "./Strategies";
+import Strategies from "./strategies/Strategies";
 import PaperTrade from "./PaperTrade";
 import Portfolio from "./Portfolio";
 import { UserContext } from "../../UserContext";
