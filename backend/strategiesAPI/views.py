@@ -4,9 +4,11 @@ from rest_framework.decorators import api_view
 from .models import Strategies
 from registerLogin.models import CustomUser
 from rest_framework import status
-import threading
 import importlib
+import multiprocessing
+import time
 
+process_list = {}
 
 @api_view(['POST'])
 def postCred(request):
@@ -47,16 +49,28 @@ def makeFile(request, pk):
     return Response({"response": "Unique File Created."}, status=status.HTTP_200_OK)
 
 
+
 @api_view(['POST'])
 def executeStrategy(request):
+    global process_list
     username = request.data['username']
     file = f"strategiesAPI.User_files.{username}"
     mod = importlib.import_module(file)
-    t = threading.Thread(target=mod.main, daemon=True)
+    t = multiprocessing.Process(target=mod.main)
+    process_list[username] = t
+    print(process_list)
     t.start()
-    for thread in threading.enumerate():
-        print(thread.name)
     return Response({"response": "Strategy Executed!"}, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def stopStrategy(request):
+    global process_list
+    username = request.data['username']
+    process_list[username].terminate()
+    del process_list[username]
+    print(process_list)
+    return Response({"response": "Strategy Stopped!"}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

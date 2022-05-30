@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import makeFile,listStrategies,postCred,executeStrategy
+from .views import makeFile,listStrategies,postCred,executeStrategy,stopStrategy
 
 urlpatterns = [
     path('api/strategies/', listStrategies, name='strategies'),
     path('api/strategies/<int:pk>', makeFile, name='makeFile'),
     path('api/postCred/', postCred, name='postCredentials'),
     path('api/execute/', executeStrategy, name='executeStrategy'),
+    path('api/stop/', stopStrategy, name='stopStrategy'),
 
 ]
