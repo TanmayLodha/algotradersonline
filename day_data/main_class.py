@@ -1,31 +1,36 @@
 import datetime
 import time
-from time import localtime, strftime
 import threading
 from alice_blue import *
 import pandas as pd
+from openpyxl import load_workbook, Workbook
 from config import Credentials
 
 SCRIPT_LIST = [
-    'ACC', 'AUBANK', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP',
-    'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE',
-    'BATAINDIA', 'BHARATFORG', 'BPCL', 'BHARTIARTL', 'BIOCON', 'CHOLAFIN',
-    'CIPLA', 'COALINDIA', 'COFORGE', 'DLF', 'DABUR', 'DIVISLAB', 'DRREDDY',
-    'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HCLTECH', 'HDFCBANK',
-    'HDFCLIFE', 'HAVELLS', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO', 'HINDUNILVR',
-    'HDFC', 'ICICIBANK', 'ICICIPRULI', 'ITC', 'IRCTC', 'IGL', 'INDUSINDBK',
-    'INFY', 'INDIGO', 'JSWSTEEL', 'JINDALSTEL', 'JUBLFOOD', 'KOTAKBANK',
-    'LICHSGFIN', 'LTI', 'LT', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI',
-    'MINDTREE', 'MUTHOOTFIN', 'PVR', 'PIDILITIND', 'PEL', 'RELIANCE',
-    'SBICARD', 'SBILIFE', 'SRF', 'SRTRANSFIN', 'SBIN', 'SUNPHARMA', 'TVSMOTOR',
-    'TATACHEM', 'TCS', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER', 'TATASTEEL',
-    'TECHM', 'TITAN', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO', 'ZEEL'
+    'ACC', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUBANK',
+    'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE', 'BATAINDIA', 'BHARATFORG',
+    'BHARTIARTL', 'BIOCON', 'BPCL', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE', 'DABUR',
+    'DIVISLAB', 'DLF', 'DRREDDY', 'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HAVELLS',
+    'HCLTECH', 'HDFC', 'HDFCBANK', 'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
+    'HINDUNILVR', 'ICICIBANK', 'ICICIPRULI', 'IGL', 'INDIGO', 'INDUSINDBK', 'INFY',
+    'IRCTC', 'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'LICHSGFIN',
+    'LT', 'LTI', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN',
+    'PEL', 'PIDILITIND', 'PVR', 'RELIANCE', 'SBICARD', 'SBILIFE', 'SBIN', 'SRF',
+    'SRTRANSFIN', 'SUNPHARMA', 'TATACHEM', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER',
+    'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TVSMOTOR', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO',
+    'ZEEL'
 ]
 
 socket_opened = False
 df = pd.DataFrame()
 df_final = pd.DataFrame()
 ORB_timeFrame = 300  # in seconds
+x = 1
+
+# Creates a new file
+filepath = f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx'
+wb = Workbook()
+wb.save(filepath)
 
 
 def login():
@@ -43,7 +48,7 @@ def login():
                           socket_open_callback=open_callback,
                           run_in_background=True)
 
-    while (socket_opened == False):
+    while not socket_opened:
         pass
 
     alice.subscribe([
@@ -52,15 +57,17 @@ def login():
 
 
 def event_handler_quote_update(message):
+    # print(message)
     ltp = message['ltp']
-    timestamp = datetime.datetime.fromtimestamp(message['exchange_time_stamp'])
+    timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
+    # timestamp = datetime.datetime.fromtimestamp(message['exchange_time_stamp'])
     vol = message['volume']
     instrument = message['instrument'].symbol
     exchange = message['instrument'].exchange
     high = message['high']
     low = message['low']
     global df
-    currentTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime())
+    # current_time = time.strftime("%Y-%m-%d %H:%M:%S", localtime())
     df_new = pd.DataFrame(
         {
             'symbol': instrument,
@@ -73,7 +80,7 @@ def event_handler_quote_update(message):
         },
         index=[0])
     df = pd.concat([df, df_new], ignore_index=True)
-    print(f"{instrument} {ltp} : {timestamp} : {vol} : {currentTime}")
+    print(f"{instrument} : {ltp} : {timestamp} : {vol}")
 
 
 def open_callback():
@@ -82,23 +89,31 @@ def open_callback():
     print("Socket opened")
 
 
-def createOHLC():
+def create_ohlc():
     start = time.time()
     global df
     copydf = df.copy(deep=True).drop_duplicates()
     df = pd.DataFrame()
-    getOHLC_df(copydf)
+    get_ohlc(copydf)
     interval = ORB_timeFrame - (time.time() - start)
     print(
         f"Next check will start after {interval} sec : {datetime.datetime.now()}"
     )
 
-    threading.Timer(interval, createOHLC).start()
+    threading.Timer(interval, create_ohlc).start()
 
 
-def getOHLC_df(df):
-    grouped = df.groupby('symbol')
+def get_ohlc(dataframe):
+    grouped = dataframe.groupby('symbol')
     global df_final
+    global x
+    book = load_workbook(
+        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
+    writer = pd.ExcelWriter(
+        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx',
+        engine='openpyxl')
+    writer.book = book
+
     for name, group in grouped:
         group = group.sort_values('timestamp')
         timestamp = group['timestamp'].iloc[0]
@@ -119,11 +134,13 @@ def getOHLC_df(df):
             'low': low,
             'exchange': exchange
         }
+
         df_append = pd.DataFrame(data, index=[0])
         df_final = pd.concat([df_final, df_append], ignore_index=True)
-        df_final.to_excel(
-            f'/Users/nitishgupta/Desktop/ORB/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx'
-        )
+        df_append.to_excel(writer, header=False, index=False, startrow=x)
+        x += 1
+    writer.save()
+    book.close()
 
 
 if __name__ == '__main__':
@@ -131,10 +148,10 @@ if __name__ == '__main__':
            or (datetime.datetime.now().time() >= datetime.time(15, 30, 00))):
         pass
 
-    alice = login()
+    login()
     # interval = ORB_timeFrame - datetime.datetime.now().second
-    interval = (5 - datetime.datetime.now().minute % 5) * 60 - (
+    main_interval = (5 - datetime.datetime.now().minute % 5) * 60 - (
         datetime.datetime.now().second)
-    print("start in ", interval)
-    time.sleep(interval)
-    createOHLC()
+    print("start in ", main_interval)
+    time.sleep(main_interval)
+    create_ohlc()

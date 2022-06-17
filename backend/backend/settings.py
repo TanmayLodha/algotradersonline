@@ -22,14 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-with open(os.path.join(BASE_DIR,'secret_key.txt')) as f:
+with open(os.path.join(BASE_DIR, 'secret_key.txt')) as f:
     SECRET_KEY = f.read().strip()
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.22.2.67','127.0.0.1']
+ALLOWED_HOSTS = ['172.22.2.67', '127.0.0.1', '115.243.103.16','192.168.29.214']
 
 
 # Application definition
@@ -117,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE =  'Asia/Kolkata'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -138,7 +138,7 @@ AUTH_USER_MODEL = 'registerLogin.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://172.22.2.67"
+    "http://172.22.2.67",
+    "http://115.243.103.16",
+    "http://192.168.29.214:3000"
 ]
-
-

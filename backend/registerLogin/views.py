@@ -10,10 +10,10 @@ from knox.views import LoginView as KnoxLoginView
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         data = request.data
-        file = "/Users/nitishgupta/Desktop/algoTrade/backend/strategiesAPI/User_files/{}.py".format(data["username"])
-        open(file,'a').close()
+        file = f'/Users/nitishgupta/Desktop/algoTrade/backend/strategiesAPI/user_files/{data["username"]}.py'
+        open(file, 'a').close()
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -27,7 +27,7 @@ class RegisterAPI(generics.GenericAPIView):
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, format=None):
+    def post(self, request, **kwargs):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
@@ -38,4 +38,3 @@ class LoginAPI(KnoxLoginView):
         temp_list.data["aliceBlueID"] = user.aliceBlueID
         temp_list.data["isCredential"] = user.isCredential
         return Response({"data": temp_list.data})
-

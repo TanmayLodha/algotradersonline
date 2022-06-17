@@ -1,27 +1,25 @@
 from alice_blue import *
-from time import sleep
 import dateutil.parser
 import datetime
 import pandas as pd
 import pandasql as ps
-from pyparsing import col
 import requests
 import openpyxl
+import re
 
 instrument_list = [
-    'ACC', 'AUBANK', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP',
-    'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE',
-    'BATAINDIA', 'BHARATFORG', 'BPCL', 'BHARTIARTL', 'BIOCON', 'CHOLAFIN',
-    'CIPLA', 'COALINDIA', 'COFORGE', 'DLF', 'DABUR', 'DIVISLAB', 'DRREDDY',
-    'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HCLTECH', 'HDFCBANK',
-    'HDFCLIFE', 'HAVELLS', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO', 'HINDUNILVR',
-    'HDFC', 'ICICIBANK', 'ICICIPRULI', 'ITC', 'IRCTC', 'IGL', 'INDUSINDBK',
-    'INFY', 'INDIGO', 'JSWSTEEL', 'JINDALSTEL', 'JUBLFOOD', 'KOTAKBANK',
-    'LICHSGFIN', 'LTI', 'LT', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI',
-    'MINDTREE', 'MUTHOOTFIN', 'PVR', 'PIDILITIND', 'PEL', 'RELIANCE',
-    'SBICARD', 'SBILIFE', 'SRF', 'SRTRANSFIN', 'SBIN', 'SUNPHARMA', 'TVSMOTOR',
-    'TATACHEM', 'TCS', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER', 'TATASTEEL',
-    'TECHM', 'TITAN', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO', 'ZEEL'
+    'ACC', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUBANK',
+    'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE', 'BATAINDIA', 'BHARATFORG',
+    'BHARTIARTL', 'BIOCON', 'BPCL', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE', 'DABUR',
+    'DIVISLAB', 'DLF', 'DRREDDY', 'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HAVELLS',
+    'HCLTECH', 'HDFC', 'HDFCBANK', 'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
+    'HINDUNILVR', 'ICICIBANK', 'ICICIPRULI', 'IGL', 'INDIGO', 'INDUSINDBK', 'INFY',
+    'IRCTC', 'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'LICHSGFIN',
+    'LT', 'LTI', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN',
+    'PEL', 'PIDILITIND', 'PVR', 'RELIANCE', 'SBICARD', 'SBILIFE', 'SBIN', 'SRF',
+    'SRTRANSFIN', 'SUNPHARMA', 'TATACHEM', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER',
+    'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TVSMOTOR', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO',
+    'ZEEL'
 ]
 
 access_token = AliceBlue.login_and_get_access_token(username=username,
@@ -33,42 +31,58 @@ alice = AliceBlue(username=username,
                   password=password,
                   access_token=access_token)
 traded_stocks = []
+df_historical = pd.DataFrame()
+
+
+def row_count(ws):
+    return int(re.search('(\d+)$', ws.dimensions).group(1))
 
 
 def main():
-    # while ((datetime.datetime.now().time() < datetime.time(9, 20, 00))):
-    #     pass
-    wrkbk = openpyxl.load_workbook(
-        f'{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
-    sh = wrkbk.active
-
-    x = 2 + len(instrument_list)
-    for i in instrument_list:
-        name = sh.cell(row=x, column=3).value
+    global df_historical
+    for x in range(len(instrument_list)):
+        name = instrument_list[x]
         vo = test(name)
-        vol = sh.cell(row=x, column=4).value
-        open = sh.cell(row=x, column=5).value
-        close = sh.cell(row=x, column=6).value
-        high = sh.cell(row=x, column=7).value
-        low = sh.cell(row=x, column=8).value
-        print(f'{name} {vol} {vo}')
-        p_open = vo[1] * 0.06
-        p_diff_b = p_open + vo[1]
-        p_diff_s = vo[1] - p_open
-        c_high = close - close * 0.03
-        c_low = close + close * 0.03
-        range_OC2 = close - open
-        range_HL2 = high - low
-        range_HL1 = high - low
-        range_OC1 = open - close
-        money = 100000
-        L1 = low - low * 0.1 / 100
-        H1 = high + high * 0.1 / 100
-        quantity_b = int(money / H1)
-        quantity_s = int(money / L1)
+        data = {'symbol': name, 'volume': vo[0], 'open': vo[1], 'close': vo[2]}
+        df_histo = pd.DataFrame(data, index=[x])
+        df_historical = pd.concat([df_historical, df_histo])
 
-        if ((vol > vo[0]) and (open < p_diff_b) and (close < c_low)
-                and (range_OC2 > range_HL2 * 0.80)):
+    while datetime.datetime.now().time() < datetime.time(9, 20, 5):
+        pass
+    wrkbk = openpyxl.load_workbook(
+        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
+    wrkbk.active = wrkbk['Sheet1']
+    sh = wrkbk.active
+    rows_num = row_count(sh)
+    print(rows_num)
+    x = rows_num - len(instrument_list) + 1
+    for y in range(len(instrument_list)):
+        name = sh.cell(row=x, column=2).value
+        vo = df_historical['volume'][y]
+        op = df_historical['open'][y]
+        clo = df_historical['close'][y]
+        vol = sh.cell(row=x, column=3).value
+        open = sh.cell(row=x, column=4).value
+        close = sh.cell(row=x, column=5).value
+        high = sh.cell(row=x, column=6).value
+        low = sh.cell(row=x, column=7).value
+        print(f'{name} {vol} {vo}')
+        p_open = op * 0.06
+        p_diff_b = p_open + op
+        p_diff_s = op - p_open
+        c_high = clo - clo * 0.03
+        c_low = clo + clo * 0.03
+        range_oc2 = close - open
+        range_hl2 = high - low
+        range_hl1 = high - low
+        range_oc1 = open - close
+        money = 100000
+        l1 = low - low * 0.1 / 100
+        h1 = high + high * 0.1 / 100
+        quantity_b = int(money / h1)
+        quantity_s = int(money / l1)
+
+        if (vol > vo) and (open < p_diff_b) and (range_oc2 > range_hl2 * 0.80) and (open <= c_high):
             print(f"Entry {name}")
             alice.place_order(transaction_type=TransactionType.Buy,
                               instrument=alice.get_instrument_by_symbol(
@@ -76,15 +90,13 @@ def main():
                               quantity=quantity_b,
                               order_type=OrderType.Market,
                               product_type=ProductType.Delivery,
-                              price=high,
+                              price=0.0,
                               trigger_price=None,
-                              stop_loss=low,
+                              stop_loss=None,
                               square_off=2 * (high - low),
                               trailing_sl=None,
                               is_amo=False)
-
-        if ((vol > vo[0]) and (open > p_diff_s) and (close > c_high)
-                and (range_OC1 > range_HL1 * 0.80)):
+        if (vol > vo) and (open > p_diff_s) and (range_oc1 > range_hl1 * 0.80) and (open <= c_low):
             print(f"Exit {name}")
             alice.place_order(transaction_type=TransactionType.Sell,
                               instrument=alice.get_instrument_by_symbol(
@@ -92,12 +104,13 @@ def main():
                               quantity=quantity_s,
                               order_type=OrderType.Market,
                               product_type=ProductType.Intraday,
-                              price=low,
+                              price=0.0,
                               trigger_price=None,
-                              stop_loss=low,
+                              stop_loss=None,
                               square_off=2 * (high - low),
                               trailing_sl=None,
                               is_amo=False)
+
         x += 1
 
 
@@ -108,18 +121,18 @@ def get_historical(instrument,
                    indices=False):
     params = {
         "token":
-        instrument.token,
+            instrument.token,
         "exchange":
-        instrument.exchange if not indices else "NSE_INDICES",
+            instrument.exchange if not indices else "NSE_INDICES",
         "starttime":
-        str(int(from_datetime.timestamp())),
+            str(int(from_datetime.timestamp())),
         "endtime":
-        str(int(to_datetime.timestamp())),
+            str(int(to_datetime.timestamp())),
         "candletype":
-        3 if interval.upper() == "DAY" else
-        (2 if interval.upper().split("_")[1] == "HR" else 1),
+            3 if interval.upper() == "DAY" else
+            (2 if interval.upper().split("_")[1] == "HR" else 1),
         "data_duration":
-        None if interval.upper() == "DAY" else interval.split("_")[0]
+            None if interval.upper() == "DAY" else interval.split("_")[0]
     }
     lst = requests.get(f" https://ant.aliceblueonline.com/api/v1/charts/tdv?",
                        params=params).json()["data"]["candles"]
@@ -153,9 +166,9 @@ def test(i):
                             month=datetime.datetime.now().month,
                             day=datetime.datetime.now().day)
     from_datetime = date_start - datetime.timedelta(
-        days=1)  ##[ON Monday Value Need to change to 4]
+        days=1)
     to_datetime = date_end - datetime.timedelta(
-        days=1)  ##[ON Monday Value Need to change to 3]
+        days=1)
     interval1 = "5_MIN"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
     interval2 = "DAY"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
     indices = False
@@ -169,10 +182,14 @@ def test(i):
 
     q1 = """SELECT  volume FROM df1 order by volume DESC LIMIT 1 """
     q2 = """SELECT  open FROM df2 """
+    q3 = """SELECT  close FROM df2 """
 
     s1 = ps.sqldf(q1, locals())
     s2 = ps.sqldf(q2, locals())
+    s3 = ps.sqldf(q3, locals())
 
     vol = s1["volume"][0]
     op = s2["open"][0]
-    return (vol, op)
+    clo = s3["close"][0]
+
+    return vol, op, clo
