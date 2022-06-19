@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Strategies, Credentials, Papertrade
+from .models import Strategies, Credentials, Papertrade, LTP
 from registerLogin.models import CustomUser
 
 
@@ -21,4 +21,10 @@ class CredentialSerializer(serializers.ModelSerializer):
 class PapertradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Papertrade
+        fields = '__all__'
+
+
+class LTPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LTP
         fields = '__all__'

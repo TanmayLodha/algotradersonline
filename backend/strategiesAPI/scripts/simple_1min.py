@@ -7,6 +7,9 @@ import pandasql as ps
 import requests
 import openpyxl
 import re
+import django
+django.setup()
+from ..models import Papertrade
 
 traded_stocks = []
 instrument_list = [
@@ -186,4 +189,69 @@ def main():
             x += 1
             wrkbk.close()
         interval = 60 - (time.time() - start)
+        time.sleep(interval)
+
+
+def start_paper_trade():
+    global df_historical
+    # noinspection PyGlobalUndefined
+    global algotrade_username
+    for x in range(len(instrument_list)):
+        name = instrument_list[x]
+        vo = test(name)
+        data = {'symbol': name, 'volume': vo}
+        df_histo = pd.DataFrame(data, index=[x])
+        df_historical = pd.concat([df_historical, df_histo])
+        print(f"{df_historical['symbol'][x]}  {df_historical['volume'][x]} {x}")
+
+    while datetime.datetime.now().time() < datetime.time(9, 16, 00):
+        pass
+    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
+    interval = 60 - datetime.datetime.now().second
+    time.sleep(interval + 2)
+
+    while datetime.time(9, 20, 2) <= datetime.datetime.now().time() <= datetime.time(15, 25, 5):
+        start = time.time()
+        wrkbk = openpyxl.load_workbook(
+            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
+        wrkbk.active = wrkbk['Sheet1']
+        sh = wrkbk.active
+        rows_num = row_count(sh)
+        print(rows_num)
+        x = rows_num - 81
+        print(f'1MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
+        for y in range(len(instrument_list)):
+            name = sh.cell(row=x, column=2).value
+            vo = df_historical['volume'][y]
+            vol = sh.cell(row=x, column=3).value
+            open = sh.cell(row=x, column=4).value
+            close = sh.cell(row=x, column=5).value
+            high = sh.cell(row=x, column=6).value
+            low = sh.cell(row=x, column=7).value
+            range_oc2 = close - open
+            range_hl2 = high - low
+            range_hl1 = high - low
+            range_oc1 = open - close
+            money = 100000
+            l1 = low - low * 0.1 / 100
+            h1 = high + high * 0.1 / 100
+            quantity_b = int(money / h1)
+            quantity_s = int(money / l1)
+            print(f'{name} {vol} {vo}')
+            if ((name not in traded_stocks) and (vol > vo) and (open < close)
+                    and (range_oc2 > range_hl2 * 0.80)):
+                traded_stocks.append(name)
+                print(f"Entry {name} {vol} {vo}")
+                Papertrade.objects.create(username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
+                                          buy_price=close, sell_price=0)
+
+            if (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80):
+                print(f"Exit {name} {name} {vol} {vo}")
+                traded_stocks.append(name)
+                Papertrade.objects.create(username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
+                                          buy_price=0, sell_price=close)
+
+            x += 1
+            wrkbk.close()
+        interval = 60 - time.time() + start
         time.sleep(interval)

@@ -6,6 +6,16 @@ import pandas as pd
 from openpyxl import load_workbook, Workbook
 from config import Credentials
 
+# To make django-models work outside django
+import sys
+import os
+import django
+sys.path.append("/Users/nitishgupta/Desktop/algoTrade/backend")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+django.setup()
+from strategiesAPI.models import LTP
+
+
 SCRIPT_LIST = [
     'ACC', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUBANK',
     'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE', 'BATAINDIA', 'BHARATFORG',
@@ -59,10 +69,15 @@ def login():
 def event_handler_quote_update(message):
     # print(message)
     ltp = message['ltp']
-    timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
-    # timestamp = datetime.datetime.fromtimestamp(message['exchange_time_stamp'])
-    vol = message['volume']
     instrument = message['instrument'].symbol
+
+    # update live LTP to database
+    q = LTP.objects.get(name=instrument)
+    q.ltp = ltp
+    q.save()
+
+    timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
+    vol = message['volume']
     exchange = message['instrument'].exchange
     high = message['high']
     low = message['low']

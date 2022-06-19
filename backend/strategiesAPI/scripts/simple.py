@@ -7,7 +7,6 @@ import pandasql as ps
 import requests
 import openpyxl
 import re
-
 import django
 django.setup()
 from ..models import Papertrade
@@ -210,8 +209,8 @@ def start_paper_trade():
 
     while datetime.datetime.now().time() < datetime.time(9, 19, 00):
         pass
-    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
-    time.sleep(15)
+    interval = (5 - datetime.datetime.now().minute % 5) * 60 - datetime.datetime.now().second
+    time.sleep(interval+2)
 
     while datetime.time(9, 20, 2) <= datetime.datetime.now().time() <= datetime.time(15, 25, 5):
         start = time.time()
@@ -222,6 +221,7 @@ def start_paper_trade():
         rows_num = row_count(sh)
         print(rows_num)
         x = rows_num - 81
+        print(f'5MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
             name = sh.cell(row=x, column=2).value
             vo = df_historical['volume'][y]
@@ -244,14 +244,15 @@ def start_paper_trade():
             if ((name not in traded_stocks) and (vol > vo) and (open < close)
                     and (range_oc2 > range_hl2 * 0.90) and (close - open < 0.03 * open) and (close > atp)):
                 traded_stocks.append(name)
-                Papertrade.objects.create(username=algotrade_username, signal='Buy', name=name, quantity=quantity_b,
+                print(f"Entry {name}")
+                Papertrade.objects.create(username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
                                           buy_price=close, sell_price=0)
 
             if ((name not in traded_stocks) and (vol > vo) and (open > close)
                     and (range_oc1 > range_hl1 * 0.90) and (open - close < 0.03 * open) and (close < atp)):
                 traded_stocks.append(name)
                 print(f"Exit {name}")
-                Papertrade.objects.create(username=algotrade_username, signal='Sell', name=name, quantity=quantity_s,
+                Papertrade.objects.create(username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
                                           buy_price=0, sell_price=close)
             x += 1
             wrkbk.close()

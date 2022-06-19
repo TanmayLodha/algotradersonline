@@ -1,11 +1,20 @@
 import datetime
 import time
-from time import localtime
 import threading
 from alice_blue import *
 import pandas as pd
 from openpyxl import load_workbook, Workbook
 from config1 import Credentials
+
+# To make django-models work outside django
+import sys
+import os
+import django
+sys.path.append("/Users/nitishgupta/Desktop/algoTrade/backend")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+django.setup()
+from strategiesAPI.models import LTP
+
 
 SCRIPT_LIST = [
     'ACC', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUBANK',
@@ -59,18 +68,24 @@ def login():
 def event_handler_quote_update(message):
     # print(message)
     ltp = message['ltp']
+    instrument = message['instrument'].symbol
+
+    # update live LTP to database
+    q = LTP.objects.get(name=instrument)
+    q.ltp = ltp
+    q.save()
+
+    timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
     # timestamp = datetime.datetime.fromtimestamp(message['exchange_time_stamp'])
     vol = message['volume']
-    instrument = message['instrument'].symbol
     exchange = message['instrument'].exchange
     high = message['high']
     low = message['low']
     global df
-    current_time = time.strftime("%Y-%m-%d %H:%M:%S", localtime())
     df_new = pd.DataFrame(
         {
             'symbol': instrument,
-            'timestamp': current_time,
+            'timestamp': timestamp,
             'vol': vol,
             'ltp': ltp,
             'high': high,
@@ -79,7 +94,7 @@ def event_handler_quote_update(message):
         },
         index=[0])
     df = pd.concat([df, df_new], ignore_index=True)
-    print(f"{instrument} : {ltp} : {current_time} : {vol}")
+    print(f"{instrument} : {ltp} : {timestamp} : {vol}")
 
 
 def open_callback():

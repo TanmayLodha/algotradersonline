@@ -37,3 +37,11 @@ class Papertrade(models.Model):
 
     def __str__(self):
         return f"{self.username} {self.name}"
+
+
+class LTP(models.Model):
+    name = models.CharField(max_length=100)
+    ltp = models.FloatField()
+
+    def __str__(self):
+        return f"{self.name} {self.ltp}"

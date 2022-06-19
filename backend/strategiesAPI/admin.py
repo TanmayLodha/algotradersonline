@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Strategies, Credentials, Papertrade
+from .models import Strategies, Credentials, Papertrade, LTP
 
 
 # Register your models here.
@@ -18,3 +18,8 @@ class CredentialAdmin(admin.ModelAdmin):
 @admin.register(Papertrade)
 class CredentialAdmin(admin.ModelAdmin):
     list_display = ['username', 'name']
+
+
+@admin.register(LTP)
+class CredentialAdmin(admin.ModelAdmin):
+    list_display = ['name', 'ltp']

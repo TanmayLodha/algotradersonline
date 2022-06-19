@@ -1,7 +1,7 @@
-from .serializers import StrategiesSerializer, CredentialSerializer, PapertradeSerializer
+from .serializers import StrategiesSerializer, CredentialSerializer, PapertradeSerializer, LTPSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import Strategies, Papertrade
+from .models import Strategies, Papertrade, LTP
 from registerLogin.models import CustomUser
 from rest_framework import status
 import importlib
@@ -125,8 +125,25 @@ def get_paper_trades(request):
 def stop_paper_trades(request):
     try:
         username = request.data['username']
+        process_list[username].terminate()
+        del process_list[username]
+        print(process_list)
         Papertrade.objects.all().filter(username=username).delete()
         return Response({"response": "Fields Deleted!"}, status=status.HTTP_200_OK)
     except KeyError:
         return Response({'response": "Oops. Your have given a wrong field. "username" expected'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def get_ltp(request):
+    try:
+        instrument = request.data['instrument']
+        queryset = LTP.objects.none()
+        for i in instrument:
+            queryset |= LTP.objects.all().filter(name=i)
+        serializer = LTPSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except KeyError:
+        return Response({'response: Provided Instrument does not exist'},
                         status=status.HTTP_400_BAD_REQUEST)
