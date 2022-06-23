@@ -6,6 +6,7 @@ from registerLogin.models import CustomUser
 from rest_framework import status
 import importlib
 import multiprocessing
+import datetime
 
 process_list = {}
 
@@ -113,9 +114,49 @@ def execute_paper_trade(request):
 def get_paper_trades(request):
     try:
         username = request.data['username']
-        queryset = Papertrade.objects.all().filter(username=username)
+        is_completed = request.data['isCompleted']
+        is_active = request.data['isActive']
+        queryset = Papertrade.objects.all().filter(username=username).filter(isCompleted=is_completed).filter(
+            isActive=is_active)
         serializer = PapertradeSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    except KeyError:
+        return Response({'response": "Oops. Your have given a wrong field. "username" expected'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def set_completed(request):
+    try:
+        username = request.data['username']
+        name = request.data['name']
+        price = request.data['price']
+        signal = request.data['signal']
+
+        queryset = Papertrade.objects.all().filter(username=username).get(name=name)
+        queryset.isCompleted = True
+        if signal == "BUY":
+            queryset.sell_price = price
+        else:
+            queryset.buy_price = price
+        # queryset.time = datetime.datetime.now().time().strftime("%H:%M")
+        queryset.save()
+        return Response({'response": order completed'}, status=status.HTTP_200_OK)
+    except KeyError:
+        return Response({'response": "Oops. Your have given a wrong field. "username" expected'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def set_active(request):
+    try:
+        username = request.data['username']
+        name = request.data['name']
+        queryset = Papertrade.objects.all().filter(username=username).get(name=name)
+        queryset.isActive = True
+        # queryset.time = datetime.datetime.now().time().strftime("%H:%M")
+        queryset.save()
+        return Response({'response": order completed'}, status=status.HTTP_200_OK)
     except KeyError:
         return Response({'response": "Oops. Your have given a wrong field. "username" expected'},
                         status=status.HTTP_400_BAD_REQUEST)

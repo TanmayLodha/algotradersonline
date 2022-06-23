@@ -127,6 +127,7 @@ def get_ohlc(dataframe):
         f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx',
         engine='openpyxl')
     writer.book = book
+    writer.sheets = {ws.title: ws for ws in book.worksheets}
 
     x = 1
     for name, group in grouped:
@@ -158,7 +159,7 @@ def get_ohlc(dataframe):
 
 
 if __name__ == '__main__':
-    while ((datetime.datetime.now().time() <= datetime.time(9, 14, 25))
+    while ((datetime.datetime.now().time() <= datetime.time(9, 14, 00))
            or (datetime.datetime.now().time() >= datetime.time(15, 30, 00))):
         pass
 

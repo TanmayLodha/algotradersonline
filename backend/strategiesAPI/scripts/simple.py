@@ -91,7 +91,7 @@ def test(i):
                             month=datetime.datetime.now().month,
                             day=datetime.datetime.now().day)
     from_datetime = date_start - datetime.timedelta(
-        days=5)
+        days=1)
     to_datetime = date_end - datetime.timedelta(
         days=1)
     interval1 = "5_MIN"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
@@ -147,6 +147,7 @@ def main():
             close = sh.cell(row=x, column=5).value
             high = sh.cell(row=x, column=6).value
             low = sh.cell(row=x, column=7).value
+            atp = sh.cell(row=x, column=9).value
             range_oc2 = close - open
             range_hl2 = high - low
             range_hl1 = high - low
@@ -157,7 +158,7 @@ def main():
             quantity_b = int(money / h1)
             quantity_s = int(money / l1)
             if ((name not in traded_stocks) and (vol > vo) and (open < close)
-                    and (range_oc2 > range_hl2 * 0.80)):
+                    and (range_oc2 > range_hl2 * 0.80) and (close > atp)):
                 traded_stocks.append(name)
                 print(f"Entry {name} {vol} {vo}")
                 alice.place_order(transaction_type=TransactionType.Buy,
@@ -174,7 +175,7 @@ def main():
                                   is_amo=False)
 
             if ((name not in traded_stocks) and (vol > vo) and (open > close)
-                    and (range_oc1 > range_hl1 * 0.80)):
+                    and (range_oc1 > range_hl1 * 0.80) and (close < atp)):
                 print(f"Exit {name} {name} {vol} {vo}")
                 traded_stocks.append(name)
                 alice.place_order(transaction_type=TransactionType.Sell,
@@ -256,5 +257,5 @@ def start_paper_trade():
                                           buy_price=0, sell_price=close)
             x += 1
             wrkbk.close()
-        interval = 60 - time.time() + start
+        interval = 300 - time.time() + start
         time.sleep(interval)

@@ -8,6 +8,7 @@ import requests
 import openpyxl
 import re
 import django
+
 django.setup()
 from ..models import Papertrade
 
@@ -91,7 +92,7 @@ def test(i):
                             month=datetime.datetime.now().month,
                             day=datetime.datetime.now().day)
     from_datetime = date_start - datetime.timedelta(
-        days=5)
+        days=1)
     to_datetime = date_end - datetime.timedelta(
         days=1)
     interval1 = "1_MIN"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
@@ -210,10 +211,10 @@ def start_paper_trade():
     interval = 60 - datetime.datetime.now().second
     time.sleep(interval + 2)
 
-    while datetime.time(9, 20, 2) <= datetime.datetime.now().time() <= datetime.time(15, 25, 5):
+    while datetime.time(9, 16, 2) <= datetime.datetime.now().time() <= datetime.time(15, 25, 5):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
-            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
+            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
@@ -228,6 +229,7 @@ def start_paper_trade():
             close = sh.cell(row=x, column=5).value
             high = sh.cell(row=x, column=6).value
             low = sh.cell(row=x, column=7).value
+            atp = sh.cell(row=x, column=9).value
             range_oc2 = close - open
             range_hl2 = high - low
             range_hl1 = high - low
@@ -238,18 +240,23 @@ def start_paper_trade():
             quantity_b = int(money / h1)
             quantity_s = int(money / l1)
             print(f'{name} {vol} {vo}')
-            if ((name not in traded_stocks) and (vol > vo) and (open < close)
-                    and (range_oc2 > range_hl2 * 0.80)):
+            if name not in traded_stocks and (vol > vo) and (open < close) and (range_oc2 > range_hl2 * 0.90 and (close > atp)):
                 traded_stocks.append(name)
+                stop_loss = close - (high-low)
+                square_off = high - low
                 print(f"Entry {name} {vol} {vo}")
-                Papertrade.objects.create(username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
-                                          buy_price=close, sell_price=0)
+                Papertrade.objects.create(time=datetime.datetime.now().time().strftime("%H:%M"),
+                                          username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
+                                          buy_price=high+0.5, sell_price=0, stop_loss=stop_loss, target=square_off)
 
-            if (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80):
+            elif (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.90) and (close < atp):
                 print(f"Exit {name} {name} {vol} {vo}")
                 traded_stocks.append(name)
-                Papertrade.objects.create(username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
-                                          buy_price=0, sell_price=close)
+                stop_loss = close + (high-low)
+                square_off = high - low
+                Papertrade.objects.create(time=datetime.datetime.now().time().strftime("%H:%M"),
+                                          username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
+                                          buy_price=0, sell_price=low-0.5, stop_loss=stop_loss, target=square_off)
 
             x += 1
             wrkbk.close()

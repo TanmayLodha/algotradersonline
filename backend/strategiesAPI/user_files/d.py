@@ -16,6 +16,7 @@ import requests
 import openpyxl
 import re
 import django
+
 django.setup()
 from ..models import Papertrade
 
@@ -99,18 +100,16 @@ def test(i):
                             month=datetime.datetime.now().month,
                             day=datetime.datetime.now().day)
     from_datetime = date_start - datetime.timedelta(
-        days=7)
+        days=1)
     to_datetime = date_end - datetime.timedelta(
-        days=3)
-    interval1 = "5_MIN"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
-    # interval2 = "DAY"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
+        days=1)
+    interval1 = "1_MIN"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
     indices = False
     df1 = pd.DataFrame(
         get_historical(instrument, from_datetime, to_datetime, interval1,
                        indices))
 
     q1 = """SELECT  volume FROM df1 order by volume DESC LIMIT 1 """
-
     s1 = ps.sqldf(q1, locals())
     vol = s1["volume"][0]
 
@@ -131,22 +130,21 @@ def main():
         df_historical = pd.concat([df_historical, df_histo])
         print(f"{df_historical['symbol'][x]}  {df_historical['volume'][x]} {x}")
 
-    while datetime.datetime.now().time() < datetime.time(9, 19, 00):
+    while datetime.datetime.now().time() < datetime.time(9, 16, 00):
         pass
-    interval = (5 - datetime.datetime.now().minute % 5) * 60 - datetime.datetime.now().second
-    # interval = 60 - datetime.datetime.now().second
+    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
+    interval = 60 - datetime.datetime.now().second
     time.sleep(interval + 2)
 
-    while ((datetime.time(9, 20, 5) <= datetime.datetime.now().time()
-            <= datetime.time(15, 25, 5))):
+    while datetime.time(9, 16, 2) <= datetime.datetime.now().time() <= datetime.time(15, 25, 5):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
-            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
+            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
+        print(f'1MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         x = rows_num - 81
-        print(f'5MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
             name = sh.cell(row=x, column=2).value
             vo = df_historical['volume'][y]
@@ -164,6 +162,7 @@ def main():
             h1 = high + high * 0.1 / 100
             quantity_b = int(money / h1)
             quantity_s = int(money / l1)
+
             if ((name not in traded_stocks) and (vol > vo) and (open < close)
                     and (range_oc2 > range_hl2 * 0.80)):
                 traded_stocks.append(name)
@@ -181,8 +180,7 @@ def main():
                                   trailing_sl=None,
                                   is_amo=False)
 
-            if ((name not in traded_stocks) and (vol > vo) and (open > close)
-                    and (range_oc1 > range_hl1 * 0.80)):
+            if (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80):
                 print(f"Exit {name} {name} {vol} {vo}")
                 traded_stocks.append(name)
                 alice.place_order(transaction_type=TransactionType.Sell,
@@ -199,7 +197,7 @@ def main():
                                   is_amo=False)
             x += 1
             wrkbk.close()
-        interval = 300 - time.time() + start
+        interval = 60 - (time.time() - start)
         time.sleep(interval)
 
 
@@ -215,21 +213,22 @@ def start_paper_trade():
         df_historical = pd.concat([df_historical, df_histo])
         print(f"{df_historical['symbol'][x]}  {df_historical['volume'][x]} {x}")
 
-    while datetime.datetime.now().time() < datetime.time(9, 19, 00):
+    while datetime.datetime.now().time() < datetime.time(9, 16, 00):
         pass
     # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
-    time.sleep(15)
+    interval = 60 - datetime.datetime.now().second
+    time.sleep(interval + 2)
 
-    while datetime.time(9, 20, 2) <= datetime.datetime.now().time() <= datetime.time(22, 25, 5):
+    while datetime.time(9, 16, 2) <= datetime.datetime.now().time() <= datetime.time(15, 25, 5):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
-            f'/Users/nitishgupta/Desktop/algoTrade/day_data/2022-06-17.xlsx')
+            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
         print(rows_num)
         x = rows_num - 81
-        print(f'5MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
+        print(f'1MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
             name = sh.cell(row=x, column=2).value
             vo = df_historical['volume'][y]
@@ -249,19 +248,24 @@ def start_paper_trade():
             quantity_b = int(money / h1)
             quantity_s = int(money / l1)
             print(f'{name} {vol} {vo}')
-            if ((name not in traded_stocks) and (vol > vo) and (open < close)
-                    and (range_oc2 > range_hl2 * 0.90) and (close - open < 0.03 * open) and (close > atp)):
+            if name not in traded_stocks and (vol > vo) and (open < close) and (range_oc2 > range_hl2 * 0.90 and (close > atp)):
                 traded_stocks.append(name)
-                print(f"Entry {name}")
-                Papertrade.objects.create(username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
-                                          buy_price=close, sell_price=0)
+                stop_loss = close - (high-low)
+                square_off = high - low
+                print(f"Entry {name} {vol} {vo}")
+                Papertrade.objects.create(time=datetime.datetime.now().time().strftime("%H:%M"),
+                                          username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
+                                          buy_price=high+0.5, sell_price=0, stop_loss=stop_loss, target=square_off)
 
-            if ((name not in traded_stocks) and (vol > vo) and (open > close)
-                    and (range_oc1 > range_hl1 * 0.90) and (open - close < 0.03 * open) and (close < atp)):
+            elif (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.90) and (close < atp):
+                print(f"Exit {name} {name} {vol} {vo}")
                 traded_stocks.append(name)
-                print(f"Exit {name}")
-                Papertrade.objects.create(username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
-                                          buy_price=0, sell_price=close)
+                stop_loss = close + (high-low)
+                square_off = high - low
+                Papertrade.objects.create(time=datetime.datetime.now().time().strftime("%H:%M"),
+                                          username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
+                                          buy_price=0, sell_price=low-0.5, stop_loss=stop_loss, target=square_off)
+
             x += 1
             wrkbk.close()
         interval = 60 - time.time() + start

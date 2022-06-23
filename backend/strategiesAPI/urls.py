@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import make_file, list_strategies, post_cred, execute_strategy, stop_strategy, get_paper_trades, \
-    execute_paper_trade, stop_paper_trades, get_ltp
+    execute_paper_trade, stop_paper_trades, get_ltp, set_completed, set_active
 
 urlpatterns = [
     path('api/strategies/', list_strategies, name='strategies'),
@@ -12,5 +12,7 @@ urlpatterns = [
     path('api/get_trades/', get_paper_trades, name='get_paper_trades'),
     path('api/stop_trades/', stop_paper_trades, name='stop_paper_trades'),
     path('api/get_ltp/', get_ltp, name='get_ltp'),
+    path('api/set_completed/', set_completed, name='set_completed'),
+    path('api/set_active/', set_active, name='set_active'),
 
 ]

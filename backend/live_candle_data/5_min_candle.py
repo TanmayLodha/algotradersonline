@@ -81,6 +81,7 @@ def event_handler_quote_update(message):
     exchange = message['instrument'].exchange
     high = message['high']
     low = message['low']
+    atp = message['atp']
     global df
     # current_time = time.strftime("%Y-%m-%d %H:%M:%S", localtime())
     df_new = pd.DataFrame(
@@ -91,11 +92,12 @@ def event_handler_quote_update(message):
             'ltp': ltp,
             'high': high,
             'low': low,
-            'exchange': exchange
+            'exchange': exchange,
+            'atp': atp
         },
         index=[0])
     df = pd.concat([df, df_new], ignore_index=True)
-    print(f"{instrument} : {ltp} : {timestamp} : {vol}")
+    print(f"{instrument} : {ltp} : {timestamp} : {vol} {atp}")
 
 
 def open_callback():
@@ -128,7 +130,9 @@ def get_ohlc(dataframe):
         f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx',
         engine='openpyxl')
     writer.book = book
+    writer.sheets = {ws.title: ws for ws in book.worksheets}
 
+    x = 1
     for name, group in grouped:
         group = group.sort_values('timestamp')
         timestamp = group['timestamp'].iloc[0]
@@ -139,6 +143,7 @@ def get_ohlc(dataframe):
         high = group['ltp'].max()
         low = group['ltp'].min()
         exchange = group['exchange'].iloc[0]
+        atp = group['atp'].iloc[-1]
         data = {
             'timestamp': timestamp,
             'symbol': symbol,
@@ -147,7 +152,8 @@ def get_ohlc(dataframe):
             'close': close,
             'high': high,
             'low': low,
-            'exchange': exchange
+            'exchange': exchange,
+            'atp': atp
         }
 
         df_append = pd.DataFrame(data, index=[0])

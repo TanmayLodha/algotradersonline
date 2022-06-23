@@ -34,6 +34,11 @@ class Papertrade(models.Model):
     quantity = models.IntegerField()
     buy_price = models.FloatField()
     sell_price = models.FloatField()
+    stop_loss = models.FloatField(default=0.0)
+    target = models.FloatField(default=0.0)
+    isCompleted = models.BooleanField(default=False)
+    isActive = models.BooleanField(default=False)
+    time = models.CharField(max_length=100, default="0")
 
     def __str__(self):
         return f"{self.username} {self.name}"
