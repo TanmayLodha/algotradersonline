@@ -1,96 +1,59 @@
-import { Button, Card, CardActions, CardContent } from "@mui/material";
-import React, { useContext, useState } from "react";
-import Backdrop from "@mui/material/Backdrop";
-import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+} from "@mui/material";
+import React, { useContext } from "react";
 import { UserContext } from "../../../UserContext";
-import AliceInputs from "./AliceInputs";
-import ConfirmExecution from "./ConfirmExecution";
-import "./stratergies.scss";
+import { createFile } from "./createFile";
 
-const StrategiesCard = ({ props }) => {
-  const [id, setId] = useState(props.id);
-  const { user, setUser } = useContext(UserContext);
+const StrategiesCard = ({ props, toggle, strategy }) => {
+  const { user } = useContext(UserContext);
   const current = JSON.parse(user);
-
-  const [backdrop, setBackdrop] = useState(false);
-  const [msg, setMsg] = useState(false);
-
-  const handleBDClose = () => {
-    setBackdrop(false);
+  const handleYesCred = () => {
+    createFile(props, current);
+    toggle();
   };
-  const handleBackdrop = () => {
-    setBackdrop(!backdrop);
+  const handleNoCred = () => {
+    strategy(props);
+    toggle();
   };
-
-  const handleMsgClose = () => {
-    setMsg(false);
-  };
-  const handleMsg = () => {
-    setMsg(!msg);
-  };
-
   return (
     <>
-      <Backdrop
+      <Card
         sx={{
-          color: "#fff",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-        open={backdrop}>
-        {current.data.isCredential ? (
-          <ConfirmExecution
-            backdropFunction={handleBDClose}
-            successFunction={handleMsg}
-            userData={current}
-            strategyid={id}
-          />
-        ) : (
-          <AliceInputs
-            backdropFunction={handleBDClose}
-            successFunction={handleMsg}
-            userData={current}
-            strategyid={id}
-          />
-        )}
-      </Backdrop>
-
-      {/* Success Backdrop */}
-      <Backdrop
-        sx={{
-          color: "#fff",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-        open={msg}>
-        <Card className="succ-card">
-          <CardContent>
-            <h1>Congrats!</h1>
-            <div className="icon">
-              <PublishedWithChangesIcon color="success" sx={{ fontSize: 90 }} />
-            </div>
-            <p>
-              Strategy is being executed. Please check your aliceblue portal for
-              entries.
-            </p>
-          </CardContent>
-          <div className="btns">
-            <Button className="in-btn" onClick={handleMsgClose}>
-              Stop Execution
-            </Button>
-          </div>
-        </Card>
-      </Backdrop>
-      <Card className="strat-card">
+          width: "20vw",
+          // height: "15vw",
+          m: 1,
+          boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
+          transition: " all .15s ease-in-out",
+          borderRadius: 3,
+        }}>
         <CardContent>
-          <div className="name">
-            <h1>{props.id}</h1>
+          <Typography
+            variant="h1"
+            sx={{ fontSize: "2rem", fontWeight: 500, m: 1 }}>
+            {props.id}
+          </Typography>
 
-            <h3>{props.name}</h3>
-          </div>
+          <Typography
+            variant="h1"
+            sx={{ fontSize: "1.5rem", fontWeight: 600, m: 1 }}>
+            {props.name}
+          </Typography>
         </CardContent>
         <CardActions>
-          <Button className="in-btn" onClick={handleBackdrop}>
-            Execute
-          </Button>
+          {current.data.isCredential ? (
+            <Button variant="contained" sx={{ m: 1 }} onClick={handleYesCred}>
+              Execute
+            </Button>
+          ) : (
+            <Button variant="contained" sx={{ m: 1 }} onClick={handleNoCred}>
+              Execute
+            </Button>
+          )}
         </CardActions>
       </Card>
     </>

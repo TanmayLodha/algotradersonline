@@ -1,17 +1,16 @@
-import React, { useState, useContext } from "react";
-import "./login.scss";
+import React, { useState, useContext, useEffect } from "react";
 import { Box } from "@mui/system";
 import {
   TextField,
-  Avatar,
   Typography,
   Button,
   Alert,
   Snackbar,
+  Grid,
 } from "@mui/material";
-import { LockOutlined } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
+import { BaseURL } from "../../BaseURL";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -20,6 +19,10 @@ function Login() {
   const [msg, setMsg] = useState(""); //alert messagge
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext); //global context
+
+  useEffect(() => {
+    document.title = "Login";
+  }, []);
 
   const msglist = [
     "Fields cannot be empty",
@@ -38,8 +41,9 @@ function Login() {
       setOpen(true);
       return;
     }
+
     const credentials = { username: username, password: password };
-    fetch("http://172.22.2.67:8000/api/login/", {
+    fetch(BaseURL + "api/login/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
@@ -72,11 +76,8 @@ function Login() {
       });
   };
 
-  var sectionStyle = {
-    backgroundImage: `url(/stacked-waves.svg)`,
-  };
   return (
-    <div className="main" style={sectionStyle}>
+    <>
       <Snackbar
         open={open}
         autoHideDuration={5000}
@@ -86,50 +87,114 @@ function Login() {
           {msg}
         </Alert>
       </Snackbar>
-      <div className="login">
-        <Box component="form" noValidate autoComplete="off" className="box">
-          <div className="form">
-            <div className="head">
-              <Avatar sx={{ m: 1 }}>
-                <LockOutlined />
-              </Avatar>
-              <Typography component="h1" variant="h5">
-                Sign in
+
+      <Grid container sx={{ height: "100vh", color: "text.primary" }}>
+        <Grid item xs={8} sx={{ bgcolor: "background.default" }}>
+          <Box>
+            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+              <Typography
+                variant="h1"
+                sx={{ fontSize: "3rem", fontWeight: 600, mt: 1, ml: 3 }}>
+                algoTrade.
               </Typography>
-            </div>
+            </Link>
+          </Box>
+          <Box
+            component="img"
+            src="Mlogin.png"
+            alt="login"
+            sx={{
+              // height: 685,
+              // width: 633,
+              pl: 20,
+              pt: 10,
+            }}
+          />
+        </Grid>
+        <Grid item xs={4} sx={{ bgcolor: "background.paper" }}>
+          <Box
+            component="form"
+            sx={{
+              pt: 20,
+              ml: 5,
+              mr: 5,
+              display: "flex",
+              flexDirection: "column",
+            }}>
+            <Typography
+              component="h1"
+              sx={{ fontSize: "1.7rem", fontWeight: 600, mb: 1 }}>
+              Welcome to algoTrade! 👋🏻
+            </Typography>
+            <Typography
+              component="h1"
+              sx={{ fontSize: "1rem", fontWeight: 500, mb: 3 }}>
+              Please sign-in to your account
+            </Typography>
+
             <TextField
               required
-              id="outlined-required"
               label="Username"
-              className="field"
               name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              sx={{ mb: 2, mt: 1 }}
             />
             <TextField
               required
-              id="outlined-password-input"
               label="Password"
               type="password"
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="field"
+              sx={{ mb: 2 }}
             />
+            <Link
+              to="/forgot-password"
+              style={{ textDecoration: "none", color: "inherit" }}>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  color: "primary.main",
+                }}>
+                Forgot Password?
+              </Typography>
+            </Link>
             <Button
               type="submit"
               variant="contained"
-              className="field in-btn"
+              sx={{ mt: 5 }}
               onClick={login}>
-              Sign In
+              Login
             </Button>
-            <Link to="/register" variant="body2" className="register-text">
-              {"Don't have an account? Register"}
-            </Link>
-          </div>
-        </Box>
-      </div>
-    </div>
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: "1rem",
+                fontWeight: 500,
+                m: 5,
+              }}>
+              New on our platform? &nbsp;
+              <Link
+                to="/register"
+                style={{ textDecoration: "none", color: "inherit" }}>
+                <Typography
+                  variant="subtitle"
+                  sx={{
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                    color: "primary.main",
+                  }}>
+                  Create an account
+                </Typography>
+              </Link>
+            </Typography>
+          </Box>
+        </Grid>
+      </Grid>
+    </>
   );
 }
 

@@ -1,96 +1,72 @@
-import React, { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { ListItemIcon, Menu, MenuItem } from "@mui/material";
-import { Logout } from "@mui/icons-material";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import React, { useContext } from "react";
+import { Box, IconButton, Typography } from "@mui/material";
+import Logout from "@mui/icons-material/Logout";
+import { ColorModeContext } from "../../ColorModeContext";
+import { useTheme } from "@mui/material/styles";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { UserContext } from "../../UserContext";
-import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 
-function Topbar() {
-  return (
-    <div className="topbar">
-      <div className="l">
-        <h1>algoTrade.</h1>
-      </div>
+function Topbar({ toggle, drawer }) {
+  const theme = useTheme();
+  const colorMode = useContext(ColorModeContext);
 
-      <div className="r">
-        <Dropdown />
-      </div>
-    </div>
-  );
-}
-
-const Dropdown = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const current = JSON.parse(user);
-
-  const navigate = useNavigate();
-
-  const [anchor, setanchor] = useState(null);
-
-  const handleOpen = (e) => {
-    setanchor(e.currentTarget);
-  };
-
-  const handleClose = () => {
-    setanchor(null);
-  };
-
-  const handleMenuClose = (e) => {
-    setanchor(null);
-  };
-
-  const profile = () => {
-    navigate("/dashboard/profile");
-  };
-
-  const logout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-    navigate("/login", { replace: true });
+  const handleProfile = (e) => {
+    drawer();
   };
   return (
     <>
-      {/* Bug in this code. Cannot put anchor below IconButton and use onMouseLeave event. */}
-      <div
-        className="drop"
-        onMouseOver={handleOpen}
-        size="small"
-        aria-controls="menu"
-        aria-haspopup="true">
-        <h2>{current.data.username}</h2>
-
-        <ArrowDropDownSharpIcon />
-      </div>
-
-      <Menu
-        id="menu"
-        anchorEl={anchor}
-        open={Boolean(anchor)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-        onClose={handleMenuClose}
-        MenuListProps={{ onMouseLeave: handleClose }}
-        PaperProps={{
-          style: {
-            width: 175,
-          },
+      <Box
+        component="nav"
+        sx={{
+          display: "flex",
+          justifyContent: "end",
+          alignItems: "center",
+          p: 1,
         }}>
-        <MenuItem onClick={profile} sx={{ color: "rgb(114, 88, 223)" }}>
-          <ListItemIcon>
-            <ManageAccountsIcon fontSize="small" />
-          </ListItemIcon>
-          Profile
-        </MenuItem>
-        <MenuItem onClick={logout} sx={{ color: "rgb(114, 88, 223)" }}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          Logout
-        </MenuItem>
-      </Menu>
+        <IconButton
+          sx={{ width: 50, height: 50 }}
+          size="large"
+          onClick={colorMode.toggleColorMode}
+          color="inherit">
+          {theme.palette.mode === "dark" ? (
+            <DarkModeIcon sx={{ fontSize: "30px" }} />
+          ) : (
+            <LightModeIcon sx={{ fontSize: "30px" }} />
+          )}
+        </IconButton>
+        <IconButton
+          sx={{
+            ml: 2,
+            mr: 2,
+            borderRadius: 2,
+            "&:hover": {
+              backgroundColor: "primary.main",
+              color: "#ffff",
+            },
+          }}
+          onClick={handleProfile}>
+          <Typography
+            variant="h1"
+            sx={{
+              fontSize: "1.6rem",
+              fontWeight: 600,
+              textAlign: "center",
+            }}>
+            {current.data.username}
+          </Typography>
+        </IconButton>
+        <IconButton
+          sx={{ p: 1, mr: 2, width: 50, height: 50 }}
+          size="large"
+          onClick={() => toggle()}>
+          <Logout sx={{ fontSize: "30px" }} />
+        </IconButton>
+      </Box>
     </>
   );
-};
+}
 
 export default Topbar;

@@ -1,76 +1,51 @@
-import { Button, Card, CardContent } from "@mui/material";
-import React from "react";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  Typography,
+} from "@mui/material";
+import React, { useContext } from "react";
+import { execfile } from "./execFile";
+import { UserContext } from "../../../UserContext";
 
-import "./stratergies.scss";
-
-const ConfirmExecution = (props) => {
+const ConfirmExecution = ({ close, msg }) => {
+  const { user } = useContext(UserContext);
+  const current = JSON.parse(user);
   const handleEvent = () => {
-    const request = { username: props.userData.data.username };
-
-    // Write unique file
-    fetch(`http://172.22.2.67:8000/api/strategies/${props.strategyid}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
-    })
-      .then((response) => {
-        if (response.ok === true) return response.json();
-        else {
-          throw new Error();
-        }
-      })
-      .then((data) => {
-        console.log(data);
-        setTimeout(5000); //Check this timeout
-        execfile();
-        props.backdropFunction();
-        props.successFunction();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const execfile = () => {
-    // Execute File
-
-    const request = { username: props.userData.data.username };
-    fetch("http://172.22.2.67:8000/api/execute/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
-    })
-      .then((response) => {
-        if (response.ok === true) return response.json();
-        else {
-          throw new Error();
-        }
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const handleCancel = () => {
-    props.backdropFunction();
+    execfile(current);
+    close();
+    msg(true);
   };
 
   return (
-    <Card className="pass-card">
+    <Card
+      sx={{
+        width: "30vw",
+        p: 1,
+        borderRadius: 3,
+        transition: " all .15s ease-in-out",
+      }}>
       <CardContent>
-        <h3>Do you want to execute this strategy? </h3>
+        <Typography
+          component="h1"
+          sx={{
+            fontSize: "2rem",
+            fontWeight: 600,
+            mb: 1,
+            textAlign: "center",
+          }}>
+          Do you want to execute this strategy?
+        </Typography>
       </CardContent>
-      <div className="btns">
-        <Button className="in-btn" onClick={handleEvent}>
+      <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Button variant="contained" onClick={handleEvent}>
           Execute
         </Button>
-        <Button className="in-btn" onClick={handleCancel}>
+        <Button variant="outlined" onClick={() => close()}>
           Cancel
         </Button>
-      </div>
+      </CardActions>
     </Card>
   );
 };
