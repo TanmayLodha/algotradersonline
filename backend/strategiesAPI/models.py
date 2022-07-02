@@ -30,7 +30,7 @@ class Credentials(models.Model):
 class Papertrade(models.Model):
     username = models.CharField(max_length=100)
     signal = models.CharField(max_length=50)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, verbose_name='Stock Name')
     quantity = models.IntegerField()
     buy_price = models.FloatField()
     sell_price = models.FloatField()
@@ -38,10 +38,11 @@ class Papertrade(models.Model):
     target = models.FloatField(default=0.0)
     isCompleted = models.BooleanField(default=False)
     isActive = models.BooleanField(default=False)
-    time = models.CharField(max_length=100, default="0")
+    start_time = models.CharField(max_length=100, default="00:00", verbose_name='Trade Started at')
+    end_time = models.CharField(max_length=100, default="00:00", verbose_name='Trade Ended at')
 
     def __str__(self):
-        return f"{self.username} {self.name}"
+        return f"{self.username} {self.name} {self.isCompleted} {self.isActive}"
 
 
 class LTP(models.Model):
@@ -50,3 +51,11 @@ class LTP(models.Model):
 
     def __str__(self):
         return f"{self.name} {self.ltp}"
+
+
+class TradedStocks(models.Model):
+    username = models.CharField(max_length=100)
+    stock_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.username} {self.stock_name}"

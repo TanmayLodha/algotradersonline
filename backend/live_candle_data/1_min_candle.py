@@ -75,17 +75,18 @@ def event_handler_quote_update(message):
     q.ltp = ltp
     q.save()
 
-    timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
+    # timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
     # timestamp = datetime.datetime.fromtimestamp(message['exchange_time_stamp'])
     vol = message['volume']
     exchange = message['instrument'].exchange
     high = message['high']
     low = message['low']
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     global df
     df_new = pd.DataFrame(
         {
             'symbol': instrument,
-            'timestamp': timestamp,
+            'timestamp': current_time,
             'vol': vol,
             'ltp': ltp,
             'high': high,
@@ -94,7 +95,7 @@ def event_handler_quote_update(message):
         },
         index=[0])
     df = pd.concat([df, df_new], ignore_index=True)
-    print(f"{instrument} : {ltp} : {timestamp} : {vol}")
+    # print(f"{instrument} : {ltp} : {timestamp} : {vol}")
 
 
 def open_callback():
@@ -107,7 +108,7 @@ def create_ohlc():
     start = time.time()
     global df
     copydf = df.copy(deep=True).drop_duplicates()
-    df = pd.DataFrame()
+    df = df.iloc[0:0]
     get_ohlc(copydf)
     interval = ORB_timeFrame - (time.time() - start)
     print(
@@ -119,6 +120,8 @@ def create_ohlc():
 
 def get_ohlc(dataframe):
     grouped = dataframe.groupby('symbol')
+    # for key, item in grouped:
+    #     print(grouped.get_group(key), "\n\n")
     global df_final
     global x
     book = load_workbook(
@@ -152,6 +155,7 @@ def get_ohlc(dataframe):
         }
 
         df_append = pd.DataFrame(data, index=[0])
+        print(df_append)
         df_append.to_excel(writer, header=False, index=False, startrow=x, startcol=0)
         x += 1
     writer.save()

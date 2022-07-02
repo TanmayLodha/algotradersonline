@@ -14,5 +14,4 @@ urlpatterns = [
     path('api/get_ltp/', get_ltp, name='get_ltp'),
     path('api/set_completed/', set_completed, name='set_completed'),
     path('api/set_active/', set_active, name='set_active'),
-
 ]
