@@ -418,7 +418,7 @@ const MyRow = ({ row, ltp, filter, id, theme, interval, arr, sp }) => {
             : "#B5DEFF"
           : "background.paper",
       borderWidth: 0.1,
-      fontWeight: Math.abs(ltp - row.strikePrice) < interval / 2 ? "600" : null,
+      fontWeight: row.strikePrice === sp ? "600" : null,
       borderColor:
         theme.palette.mode === "dark"
           ? "rgba(255,255,255,1)"
