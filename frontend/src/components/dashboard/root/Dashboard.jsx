@@ -12,7 +12,8 @@ import ConfirmExecution from "../strategies/ConfirmExecution";
 import SuccessCard from "./SuccessCard";
 import LogoutCheck from "./LogoutCheck";
 
-import { Box, Backdrop, Drawer } from "@mui/material";
+import { Box, Backdrop, Drawer, Grid } from "@mui/material";
+import OptionsData from "../optionsChain/OptionsData";
 
 function Dashboard() {
   useEffect(() => {
@@ -48,6 +49,7 @@ function Dashboard() {
   };
 
   //Expandable SideBar
+  // eslint-disable-next-line
   const [mini, setMini] = useState(true);
   const handleMiniOpen = () => {
     setMini(false);
@@ -87,6 +89,17 @@ function Dashboard() {
       logout();
       window.location.reload();
     }
+  });
+
+  const [isTablet, setTablet] = useState(window.innerWidth <= 1024);
+
+  const updateMedia = () => {
+    setTablet(window.innerWidth <= 1024);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", updateMedia);
+    return () => window.removeEventListener("resize", updateMedia);
   });
 
   return (
@@ -158,58 +171,47 @@ function Dashboard() {
           color: "text.primary",
           transition: " all .15s ease-in-out",
         }}>
-        <Box
-          sx={{
-            pt: 0,
-            pr: 0.5,
-            position: "fixed",
-            height: "100vh",
-            width: "8vw",
-            zIndex: 1,
-            bgcolor: "background.default",
-            ...(mini === false && {
-              width: "17vw",
-              boxShadow: "1px 0px 20px 10px rgba(0,0,0,0.1)",
-              transition: " all .15s ease-in-out",
-            }),
-            transition: " all .15s ease-in-out",
-          }}>
-          <Sidebar
-            handleMiniOpen={handleMiniOpen}
-            handleMiniClose={handleMiniClose}
-          />
-        </Box>
+        <Grid container>
+          {!isTablet ? (
+            <Grid item xs={1}>
+              <Box
+                sx={{
+                  zIndex: 1,
+                  transition: " all .15s ease-in-out",
+                  position: "fixed",
+                }}>
+                <Sidebar
+                  handleMiniOpen={handleMiniOpen}
+                  handleMiniClose={handleMiniClose}
+                />
+              </Box>
+            </Grid>
+          ) : null}
 
-        <Box
-          sx={{
-            pt: 0,
-            pr: 0.5,
-            position: "fixed",
-            left: "9vw",
-            height: "100vh",
-            width: "92vw",
-            overflow: "scroll",
-          }}>
-          <Topbar toggle={handleToggle} drawer={openDrawer} />
-          <Box component="section">
-            <Routes>
-              <Route
-                path="strategies"
-                element={
-                  <Strategies
-                    toggle={handleAliceToggle}
-                    strategy={handleStrategy}
-                  />
-                }
-              />
-              <Route path="paperTrade/*" element={<PaperTrade />} />
-              <Route path="portfolio" element={<Portfolio />} />
-              <Route path="profile" element={<Profile />} />
-
-              <Route path="*" element={<Navigate to="portfolio" />} />
-            </Routes>
-          </Box>
-        </Box>
+          <Grid item xs={isTablet ? 12 : 11}>
+            <Topbar toggle={handleToggle} drawer={openDrawer} />
+            <Box
+              component="section"
+              sx={{ pr: 2, bgcolor: "background.default" }}>
+              <Routes>
+                <Route
+                  path="strategies"
+                  element={
+                    <Strategies
+                      toggle={handleAliceToggle}
+                      strategy={handleStrategy}
+                    />
+                  }
+                />
+                <Route path="paperTrade/*" element={<PaperTrade />} />
+                <Route path="portfolio" element={<Portfolio />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="optionChain" element={<OptionsData />} />
+                <Route path="*" element={<Navigate to="portfolio" />} />
+              </Routes>
+            </Box>
+          </Grid>
+        </Grid>
       </Box>
     </>
   );

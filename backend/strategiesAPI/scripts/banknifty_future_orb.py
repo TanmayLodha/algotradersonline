@@ -47,7 +47,7 @@ def get_historical(instrument,
         "data_duration":
             None if interval.upper() == "DAY" else interval.split("_")[0]
     }
-    lst = requests.get(f"https://ant.aliceblueonline.com/api/v1/charts/tdv?",
+    lst = requests.get(f" https://ant.aliceblueonline.com/api/v1/charts/tdv?",
                        params=params).json()["data"]["candles"]
     records = []
     for i in lst:
@@ -112,18 +112,17 @@ def row_count(ws):
 #         df_histo = pd.DataFrame(data, index=[x])
 #         df_historical = pd.concat([df_historical, df_histo])
 #         print(f"{df_historical['symbol'][x]}  {df_historical['volume'][x]} {x}")
-#
+
 #     while datetime.datetime.now().time() < datetime.time(9, 15, 00):
 #         pass
 #     # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
 #     interval = 60 - datetime.datetime.now().second
 #     time.sleep(interval + 2)
-#
+
 #     while datetime.time(9, 16, 2) <= datetime.datetime.now().time() <= datetime.time(15, 25, 5):
 #         start = time.time()
 #         wrkbk = openpyxl.load_workbook(
-#             f'/home/vmadmin/Desktop/algoTrade-main/backend/live_candle_data/'
-#             f'{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
+#             f'/home/vmadmin/Desktop/algoTrade-main/backend/live_candle_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
 #         wrkbk.active = wrkbk['Sheet1']
 #         sh = wrkbk.active
 #         rows_num = row_count(sh)
@@ -147,7 +146,7 @@ def row_count(ws):
 #             h1 = high + high * 0.1 / 100
 #             quantity_b = int(money / h1)
 #             quantity_s = int(money / l1)
-#
+
 #             if ((name not in traded_stocks) and (vol > vo) and (open < close)
 #                     and (range_oc2 > range_hl2 * 0.80) and (close > atp)):
 #                 traded_stocks.append(name)
@@ -164,9 +163,8 @@ def row_count(ws):
 #                                   square_off=float(2 * (high - low)),
 #                                   trailing_sl=None,
 #                                   is_amo=False)
-#
-#             if (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80) \
-#                     and (close < atp):
+
+#             if (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80) and (close < atp):
 #                 print(f"Exit {name} {name} {vol} {vo}")
 #                 traded_stocks.append(name)
 #                 alice.place_order(transaction_type=TransactionType.Sell,
@@ -198,18 +196,20 @@ def start_paper_trade():
     df_historical = pd.DataFrame(data, index=[0])
     print(f"{df_historical['symbol'][0]}  {df_historical['high'][0]} {df_historical['low'][0]}")
 
-    while datetime.datetime.now().time() < datetime.time(10, 15, 00):
+    while datetime.datetime.now().time() < datetime.time(9, 30, 00):
         pass
+    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
     interval = 60 - datetime.datetime.now().second
     time.sleep(interval + 2)
 
-    while datetime.time(10, 16, 0) <= datetime.datetime.now().time() <= datetime.time(15, 0, 0):
+    while datetime.time(9, 31, 0) <= datetime.datetime.now().time() <= datetime.time(15, 0, 0):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
             f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
+        # print(rows_num)
         print(f'BANKNIFTY candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for x in range(rows_num - 82, rows_num):
             name = sh.cell(row=x, column=2).value
@@ -219,13 +219,12 @@ def start_paper_trade():
                 close = sh.cell(row=x, column=5).value
                 high = sh.cell(row=x, column=6).value
                 low = sh.cell(row=x, column=7).value
-
                 if (name not in traded_stocks) and close > hi:
                     traded_stocks.append(name)
                     stop_loss = high - 30
                     square_off = 100
                     print(f"Entry {name} {high} {hi}")
-                    Papertrade.objects.create(time=datetime.datetime.now().time().strftime("%H:%M"),
+                    Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                               username=algotrade_username, signal='BUY', name=name, quantity=50,
                                               buy_price=high + 20, sell_price=0, stop_loss=stop_loss, target=square_off)
 
@@ -234,9 +233,8 @@ def start_paper_trade():
                     traded_stocks.append(name)
                     stop_loss = low + 30
                     square_off = 100
-                    Papertrade.objects.create(time=datetime.datetime.now().time().strftime("%H:%M"),
-                                              username=algotrade_username, signal='SELL', name=name,
-                                              quantity=50,
+                    Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
+                                              username=algotrade_username, signal='SELL', name=name, quantity=50,
                                               buy_price=0, sell_price=low - 20, stop_loss=stop_loss, target=square_off)
 
         wrkbk.close()

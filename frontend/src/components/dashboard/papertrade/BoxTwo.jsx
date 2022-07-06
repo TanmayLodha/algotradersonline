@@ -107,7 +107,7 @@ function BoxTwo() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            mt: 3,
+            mt: 2,
           }}>
           <FormControl disabled={submit}>
             <InputLabel id="demo-simple-select-autowidth-label">

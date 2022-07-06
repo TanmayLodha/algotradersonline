@@ -18,7 +18,7 @@ function Login() {
   const [open, setOpen] = useState(false); //snackbar
   const [msg, setMsg] = useState(""); //alert messagge
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext); //global context
+  const { setUser } = useContext(UserContext); //global context
 
   useEffect(() => {
     document.title = "Login";

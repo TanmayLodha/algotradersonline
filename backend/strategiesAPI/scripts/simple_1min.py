@@ -21,7 +21,7 @@ instrument_list = [
     'HCLTECH', 'HDFC', 'HDFCBANK', 'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
     'HINDUNILVR', 'ICICIBANK', 'ICICIPRULI', 'IGL', 'INDIGO', 'INDUSINDBK', 'INFY',
     'IRCTC', 'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'LICHSGFIN',
-    'LT', 'LTI', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN',
+    'LT', 'LTI', 'LUPIN', 'M&M', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN',
     'PEL', 'PIDILITIND', 'PVR', 'RELIANCE', 'SBICARD', 'SBILIFE', 'SBIN', 'SRF',
     'SRTRANSFIN', 'SUNPHARMA', 'TATACHEM', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER',
     'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TVSMOTOR', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO',
@@ -91,8 +91,6 @@ def test(i):
                             year=datetime.datetime.now().year,
                             month=datetime.datetime.now().month,
                             day=datetime.datetime.now().day)
-
-    # If weekday is Monday, historical will be of friday
     if datetime.datetime.now().weekday() == 0:
         from_datetime = date_start - datetime.timedelta(
             days=3)
@@ -103,7 +101,6 @@ def test(i):
             days=1)
         to_datetime = date_end - datetime.timedelta(
             days=1)
-
     interval1 = "1_MIN"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
     indices = False
     df1 = pd.DataFrame(
@@ -133,6 +130,7 @@ def main():
 
     while datetime.datetime.now().time() < datetime.time(9, 15, 00):
         pass
+    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
     interval = 60 - datetime.datetime.now().second
     time.sleep(interval + 2)
 
@@ -223,7 +221,7 @@ def start_paper_trade():
 
     while datetime.datetime.now().time() < datetime.time(9, 15, 00):
         pass
-
+    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
     interval = 60 - datetime.datetime.now().second
     time.sleep(interval + 2)
 
@@ -234,7 +232,8 @@ def start_paper_trade():
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
-        x = rows_num - 82
+        # print(rows_num)
+        x = rows_num - 81
         print(f'1MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
             name = sh.cell(row=x, column=2).value
@@ -259,12 +258,14 @@ def start_paper_trade():
             h1 = high + high * 0.1 / 100
             quantity_b = int(money / h1)
             quantity_s = int(money / l1)
+            # print(f'{name} {vol} {vo}')
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and (
                     vol > vo) and (open < close)
                     and (range_oc2 > range_hl2 * 0.90) and (close > atp)):
-                print(f"Entry {name} {vol} {vo}")
+                # traded_stocks.append(name)
                 stop_loss = high + 0.5 - (high - low) / 2
-                square_off = (high - low) / 2
+                square_off = (high - low)
+                print(f"Entry {name} {vol} {vo}")
                 TradedStocks.objects.create(username=algotrade_username, stock_name=name)
                 Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                           username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
@@ -273,9 +274,11 @@ def start_paper_trade():
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and (
                     vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.90) and (close < atp)):
                 print(f"Exit {name} {vol} {vo}")
+                # traded_stocks.append(name)
                 stop_loss = low - 0.5 + (high - low) / 2
-                square_off = (high - low) / 2
+                square_off = (high - low)
                 TradedStocks.objects.create(username=algotrade_username, stock_name=name)
+
                 Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                           username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
                                           buy_price=0, sell_price=low - 0.5, stop_loss=stop_loss, target=square_off)

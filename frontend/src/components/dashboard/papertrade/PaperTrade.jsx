@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Card } from "@mui/material";
+import { Card, Grid } from "@mui/material";
 import BoxOne from "./BoxOne";
 import BoxTwo from "./BoxTwo";
 import BoxThree from "./BoxThree";
@@ -26,53 +26,45 @@ function PaperTrade() {
   };
 
   return (
-    <Box
-      component="main"
-      sx={{
-        pt: 3,
-        pr: 3,
-        display: "flex",
-        flexDirection: "column",
-      }}>
-      <Box sx={{ display: "flex" }}>
-        <Card
-          sx={{
-            width: "29vw",
-            height: "12vw",
-            ml: 1,
-            p: 2,
-            borderRadius: 3,
-            boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
-            transition: " all .15s ease-in-out",
-          }}>
-          <BoxOne paperMoney={paperMoney} />
-        </Card>
-        <Card
-          sx={{
-            width: "60vw",
-            height: "12vw",
-            ml: 2,
-            p: 2,
-
-            borderRadius: 3,
-            boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
-            transition: " all .15s ease-in-out",
-          }}>
-          <BoxTwo />
-        </Card>
-      </Box>
-      <Card
-        sx={{
-          mt: 2,
-          ml: 1,
-          p: 2,
-          borderRadius: 3,
-          boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
-          transition: " all .15s ease-in-out",
-        }}>
-        <BoxThree updateMoney={updateMoney} />
-      </Card>
-    </Box>
+    <>
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid item xs={4}>
+          <Card
+            sx={{
+              p: 2,
+              ml: 3,
+              borderRadius: 3,
+              boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
+              transition: " all .15s ease-in-out",
+            }}>
+            <BoxOne paperMoney={paperMoney} />
+          </Card>
+        </Grid>
+        <Grid item xs={8}>
+          <Card
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
+              transition: " all .15s ease-in-out",
+            }}>
+            <BoxTwo />
+          </Card>
+        </Grid>
+        <Grid item xs={12}>
+          <Card
+            sx={{
+              p: 2,
+              ml: 3,
+              borderRadius: 3,
+              boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
+              transition: " all .15s ease-in-out",
+            }}>
+            <BoxThree updateMoney={updateMoney} />
+          </Card>
+        </Grid>
+      </Grid>
+    </>
   );
 }
 

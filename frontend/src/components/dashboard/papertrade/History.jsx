@@ -7,6 +7,7 @@ import {
   TableCell,
   TableRow,
   TableBody,
+  TableFooter,
 } from "@mui/material";
 
 function History({ achievedData, updateMoney }) {
@@ -37,7 +38,14 @@ function History({ achievedData, updateMoney }) {
                     <Typography
                       variant="subtitle"
                       sx={{ fontSize: "1rem", fontWeight: 600 }}>
-                      Time
+                      Start Time
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      variant="subtitle"
+                      sx={{ fontSize: "1rem", fontWeight: 600 }}>
+                      End Time
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -87,7 +95,8 @@ function History({ achievedData, updateMoney }) {
               <TableBody>
                 {achievedData.map((row, id) => (
                   <TableRow key={row.id}>
-                    <TableCell>{row.time}</TableCell>
+                    <TableCell>{row.start_time}</TableCell>
+                    <TableCell>{row.end_time}</TableCell>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.quantity}</TableCell>
                     <TableCell>{row.buy_price}</TableCell>
@@ -114,8 +123,10 @@ function History({ achievedData, updateMoney }) {
                     <TableCell>{totalCharges[id].toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
-                <TableRow hover>
-                  <TableCell colSpan={4} />
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={5} />
                   <TableCell>
                     <Typography
                       variant="subtitle"
@@ -129,7 +140,7 @@ function History({ achievedData, updateMoney }) {
                     ₹ {total.toFixed(2)}
                   </TableCell>
                 </TableRow>
-              </TableBody>
+              </TableFooter>
             </Table>
           </TableContainer>
         </>

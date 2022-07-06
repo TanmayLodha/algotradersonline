@@ -20,7 +20,7 @@ instrument_list = [
     'HCLTECH', 'HDFC', 'HDFCBANK', 'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
     'HINDUNILVR', 'ICICIBANK', 'ICICIPRULI', 'IGL', 'INDIGO', 'INDUSINDBK', 'INFY',
     'IRCTC', 'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'LICHSGFIN',
-    'LT', 'LTI', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN',
+    'LT', 'LTI', 'LUPIN', 'M&M', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN',
     'PEL', 'PIDILITIND', 'PVR', 'RELIANCE', 'SBICARD', 'SBILIFE', 'SBIN', 'SRF',
     'SRTRANSFIN', 'SUNPHARMA', 'TATACHEM', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER',
     'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TVSMOTOR', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO',
@@ -213,14 +213,14 @@ def start_paper_trade():
     interval = (5 - datetime.datetime.now().minute % 5) * 60 - datetime.datetime.now().second
     time.sleep(interval+2)
 
-    while datetime.time(9, 20, 0) <= datetime.datetime.now().time() <= datetime.time(15, 0, 0):
+    while datetime.time(9, 20, 2) <= datetime.datetime.now().time() <= datetime.time(15, 0, 0):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
-            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
+            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
-        x = rows_num - 81
+        x = rows_num - 80
         print(f'5MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
             name = sh.cell(row=x, column=2).value
@@ -245,9 +245,9 @@ def start_paper_trade():
                     (vol > vo) and (open < close) and (range_oc2 > range_hl2 * 0.80) and (close - open < 0.03 * open)
                     and (close > atp)):
                 print(f"Entry {name} {vol} {vo}")
-                TradedStocks.objects.create(username=algotrade_username, stock_name=name)
                 stop_loss = close - (high-low)
                 square_off = high - low
+                TradedStocks.objects.create(username=algotrade_username, stock_name=name)
                 Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                           username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
                                           buy_price=high+((high-low)/4), sell_price=0, stop_loss=stop_loss,
@@ -257,14 +257,14 @@ def start_paper_trade():
                     (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80) and (open - close < 0.03 * open)
                     and (close < atp)):
                 print(f"Exit {name} {vol} {vo}")
-                TradedStocks.objects.create(username=algotrade_username, stock_name=name)
                 stop_loss = close + (high-low)
                 square_off = high - low
+                TradedStocks.objects.create(username=algotrade_username, stock_name=name)
                 Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                           username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
                                           buy_price=0, sell_price=low-((high-low)/4), stop_loss=stop_loss,
                                           target=square_off)
             x += 1
-            wrkbk.close()
+        wrkbk.close()
         interval = 300 - time.time() + start
         time.sleep(interval)

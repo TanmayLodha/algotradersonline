@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 function ForgotPass() {
   const [email, setEmail] = useState("");
   const [open, setOpen] = useState(false); //snackbar
+  // eslint-disable-next-line
   const [msg, setMsg] = useState(""); //alert messagge
   // msg: Email sent
 

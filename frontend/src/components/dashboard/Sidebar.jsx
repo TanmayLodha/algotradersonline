@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import CandlestickChartOutlinedIcon from "@mui/icons-material/CandlestickChartOutlined";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
+import DataThresholdingIcon from "@mui/icons-material/DataThresholding";
 import { Link } from "react-router-dom";
 import { Typography, Tabs, Tab, Box, Divider } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -13,8 +14,6 @@ const LinkTabs = styled((props) => (
     TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
   />
 ))({
-  marginTop: 20,
-  opacity: 1,
   "& .MuiTabs-indicator": {
     display: "none",
   },
@@ -35,20 +34,21 @@ const LinkTab = styled((props) => (
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-evenly",
-  // fontWeight: theme.typography.fontWeightRegular,
-  // fontSize: theme.typography.pxToRem(15),
-  marginRight: theme.spacing(1),
-
-  borderRadius: "0px 35px 35px 0px",
-  color: "text.primary",
-  marginBottom: 30,
+  margin: 5,
+  borderRadius: 10,
+  marginBottom: 20,
+  padding: 35,
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+  },
   "&.Mui-selected": {
-    backgroundColor: "#874cf7",
-    padding: 35,
+    backgroundColor: "rgb(104,115,250)",
     color: "#fff",
     transition: "all .15s ease-in-out",
   },
-  "&.Mui-focusVisible": {},
+  "&.Mui-focusVisible": {
+    display: "block",
+  },
 }));
 
 function Sidebar({ handleMiniOpen, handleMiniClose }) {
@@ -73,29 +73,31 @@ function Sidebar({ handleMiniOpen, handleMiniClose }) {
       onMouseEnter={handleOpen}
       onMouseLeave={handleClose}
       sx={{
-        position: "fixed",
         height: "100vh",
-        width: "8vw",
-        ...(mini === false && {
-          width: "17vw",
-          transition: " all .15s ease-in-out",
-        }),
+        backgroundColor: "background.default",
         transition: " all .15s ease-in-out",
+        position: "fixed",
+        width: "9vw",
+        ...(mini === false && {
+          width: "20vw",
+          boxShadow: "1px 0px 20px 10px rgba(0,0,0,0.1)",
+        }),
       }}>
       {mini ? (
         <>
           <Typography
             variant="h1"
             sx={{
-              fontSize: "1.5rem",
+              fontSize: "1.4rem",
               fontWeight: 600,
-              ml: 1.5,
+              ml: 1,
               pt: 3,
               color: "text.secondary",
+              transition: "all .15s ease-in-out",
             }}>
             algoTrade.
           </Typography>
-          <Divider sx={{ borderBottomWidth: 1, mt: 3, ml: 1 }} />
+          <Divider sx={{ borderBottomWidth: 1, m: 1 }} />
           <LinkTabs
             value={value}
             onChange={handleChange}
@@ -112,6 +114,10 @@ function Sidebar({ handleMiniOpen, handleMiniClose }) {
               pathname="paperTrade"
               icon={<ReceiptOutlinedIcon sx={{ fontSize: "40px" }} />}
             />
+            <LinkTab
+              pathname="optionChain"
+              icon={<DataThresholdingIcon sx={{ fontSize: "40px" }} />}
+            />
           </LinkTabs>
         </>
       ) : (
@@ -121,13 +127,14 @@ function Sidebar({ handleMiniOpen, handleMiniClose }) {
             sx={{
               fontSize: "2rem",
               fontWeight: 600,
-              ml: 6,
+              ml: 10,
               pt: 3,
               color: "text.secondary",
+              transition: "all .15s ease-in-out",
             }}>
             algoTrade.
           </Typography>
-          <Divider sx={{ borderBottomWidth: 1, m: 2 }} />
+          <Divider sx={{ borderBottomWidth: 1, m: 1 }} />
 
           <LinkTabs
             value={value}
@@ -147,6 +154,11 @@ function Sidebar({ handleMiniOpen, handleMiniClose }) {
               label="Papertrade"
               pathname="paperTrade"
               icon={<ReceiptOutlinedIcon sx={{ fontSize: "40px" }} />}
+            />
+            <LinkTab
+              label="Option Chain"
+              pathname="optionChain"
+              icon={<DataThresholdingIcon sx={{ fontSize: "40px" }} />}
             />
           </LinkTabs>
         </>

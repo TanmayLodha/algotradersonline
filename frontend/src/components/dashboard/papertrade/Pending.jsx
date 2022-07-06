@@ -7,6 +7,7 @@ import {
   TableCell,
   TableRow,
   TableBody,
+  TableFooter,
 } from "@mui/material";
 import { BaseURL } from "../../../BaseURL";
 import { UserContext } from "../../../UserContext";
@@ -161,7 +162,7 @@ function Pending({ pendingData, updateMoney }) {
                     ) : (
                       <TableCell sx={{ color: "red" }}>{row.signal}</TableCell>
                     )}
-                    <TableCell>{row.time}</TableCell>
+                    <TableCell>{row.start_time}</TableCell>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.quantity}</TableCell>
                     <TableCell>
@@ -204,7 +205,9 @@ function Pending({ pendingData, updateMoney }) {
                     </TableCell>
                   </TableRow>
                 ))}
-                <TableRow hover>
+              </TableBody>
+              <TableFooter>
+                <TableRow>
                   <TableCell colSpan={5} />
                   <TableCell>
                     <Typography
@@ -219,7 +222,7 @@ function Pending({ pendingData, updateMoney }) {
                     ₹ {total.toFixed(2)}
                   </TableCell>
                 </TableRow>
-              </TableBody>
+              </TableFooter>
             </Table>
           </TableContainer>
         </>

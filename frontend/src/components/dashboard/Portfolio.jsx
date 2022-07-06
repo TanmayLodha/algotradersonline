@@ -24,9 +24,8 @@ function Portfolio() {
   return (
     <Card
       sx={{
-        width: "89vw",
-        mt: 2,
-        ml: 1,
+        mt: 1,
+        ml: 3,
         p: 1,
         borderRadius: 3,
         boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
@@ -38,7 +37,6 @@ function Portfolio() {
           sx={{ fontSize: "2rem", fontWeight: 600, m: 1 }}>
           Today's Summary
         </Typography>
-        {/* <Divider sx={{ borderBottomWidth: 1, m: 2 }} /> */}
 
         {range ? (
           <Typography

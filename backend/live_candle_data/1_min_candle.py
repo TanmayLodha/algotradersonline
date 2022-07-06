@@ -24,7 +24,7 @@ SCRIPT_LIST = [
     'HCLTECH', 'HDFC', 'HDFCBANK', 'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
     'HINDUNILVR', 'ICICIBANK', 'ICICIPRULI', 'IGL', 'INDIGO', 'INDUSINDBK', 'INFY',
     'IRCTC', 'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'LICHSGFIN',
-    'LT', 'LTI', 'LUPIN', 'M&M', 'MANAPPURAM', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN',
+    'LT', 'LTI', 'LUPIN', 'M&M', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN', 'Nifty 50', 'Nifty Bank',
     'PEL', 'PIDILITIND', 'PVR', 'RELIANCE', 'SBICARD', 'SBILIFE', 'SBIN', 'SRF',
     'SRTRANSFIN', 'SUNPHARMA', 'TATACHEM', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER',
     'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TVSMOTOR', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO',
@@ -61,12 +61,13 @@ def login():
         pass
 
     alice.subscribe([
-        alice.get_instrument_by_symbol('NSE', i.upper()) for i in SCRIPT_LIST
+        alice.get_instrument_by_symbol('NSE', i) for i in SCRIPT_LIST
     ], LiveFeedType.MARKET_DATA)
 
+    alice.subscribe(alice.get_instrument_for_fno(symbol = 'BANKNIFTY', expiry_date=datetime.date(2022, 7, 28), is_fut=True, strike=None, is_CE = False)
+    , LiveFeedType.MARKET_DATA)
 
 def event_handler_quote_update(message):
-    # print(message)
     ltp = message['ltp']
     instrument = message['instrument'].symbol
 
@@ -75,27 +76,29 @@ def event_handler_quote_update(message):
     q.ltp = ltp
     q.save()
 
-    # timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
+    timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
     # timestamp = datetime.datetime.fromtimestamp(message['exchange_time_stamp'])
     vol = message['volume']
     exchange = message['instrument'].exchange
     high = message['high']
     low = message['low']
-    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    atp = message['atp']
     global df
     df_new = pd.DataFrame(
         {
             'symbol': instrument,
-            'timestamp': current_time,
+            'timestamp': timestamp,
             'vol': vol,
             'ltp': ltp,
             'high': high,
             'low': low,
-            'exchange': exchange
+            'exchange': exchange,
+            'atp':atp
         },
         index=[0])
     df = pd.concat([df, df_new], ignore_index=True)
-    # print(f"{instrument} : {ltp} : {timestamp} : {vol}")
+
+    # print(f"{instrument} : {ltp} : {timestamp} : {vol} : {atp}")
 
 
 def open_callback():
@@ -108,6 +111,7 @@ def create_ohlc():
     start = time.time()
     global df
     copydf = df.copy(deep=True).drop_duplicates()
+    print(copydf)
     df = df.iloc[0:0]
     get_ohlc(copydf)
     interval = ORB_timeFrame - (time.time() - start)
@@ -143,6 +147,7 @@ def get_ohlc(dataframe):
         high = group['ltp'].max()
         low = group['ltp'].min()
         exchange = group['exchange'].iloc[0]
+        atp = group['atp'].iloc[-1]
         data = {
             'timestamp': timestamp,
             'symbol': symbol,
@@ -151,11 +156,11 @@ def get_ohlc(dataframe):
             'close': close,
             'high': high,
             'low': low,
-            'exchange': exchange
+            'exchange': exchange,
+            'atp': atp
         }
 
         df_append = pd.DataFrame(data, index=[0])
-        print(df_append)
         df_append.to_excel(writer, header=False, index=False, startrow=x, startcol=0)
         x += 1
     writer.save()
