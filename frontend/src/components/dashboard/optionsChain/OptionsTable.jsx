@@ -100,12 +100,27 @@ function OptionsTable({ data, ltp, filter }) {
                 </Typography>
               </TableCell>
               <TableCell
-                colSpan={1}
                 align="center"
+                rowSpan={2}
                 sx={{
+                  borderWidth: 0.1,
+                  borderRightWidth: 1,
+                  borderBottomWidth: 1,
                   backgroundColor:
                     theme.palette.mode === "dark" ? "rgb(68,65,42)" : "#FFB6C1",
-                }}></TableCell>
+
+                  borderColor:
+                    theme.palette.mode === "dark"
+                      ? "text.primary"
+                      : "rgba(0, 0, 0, 0.2)",
+                  borderStyle: "solid",
+                }}>
+                <Typography
+                  variant="subtitle"
+                  sx={{ fontSize: "1.2rem", fontWeight: 600 }}>
+                  STRIKE PRICE
+                </Typography>
+              </TableCell>
               <TableCell
                 colSpan={
                   cnt === 4
@@ -244,27 +259,6 @@ function OptionsTable({ data, ltp, filter }) {
                 </>
               )}
 
-              <TableCell
-                align="center"
-                sx={{
-                  borderWidth: 0.1,
-                  borderRightWidth: 1,
-                  borderBottomWidth: 1,
-                  backgroundColor:
-                    theme.palette.mode === "dark" ? "rgb(68,65,42)" : "#FFB6C1",
-
-                  borderColor:
-                    theme.palette.mode === "dark"
-                      ? "text.primary"
-                      : "rgba(0, 0, 0, 0.2)",
-                  borderStyle: "solid",
-                }}>
-                <Typography
-                  variant="subtitle"
-                  sx={{ fontSize: "1rem", fontWeight: 600 }}>
-                  STRIKE PRICE
-                </Typography>
-              </TableCell>
               {filter.bidAsk && (
                 <>
                   <HeadTableCell align="center">

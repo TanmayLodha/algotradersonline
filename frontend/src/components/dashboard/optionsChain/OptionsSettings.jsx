@@ -48,7 +48,13 @@ function OptionsSettings({
           sx={{ fontSize: "0.9rem", fontWeight: 400 }}>
           Settings
         </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mt: 2,
+            flexWrap: "wrap",
+          }}>
           <FormControl sx={{ m: 1, minWidth: 150 }}>
             <InputLabel id="demo-simple-select-label" sx={{ zIndex: 0 }}>
               Select Index
@@ -130,12 +136,12 @@ function OptionsSettings({
             sx={{ fontSize: "0.9rem", fontWeight: 200, ml: 2 }}>
             Filters
           </Typography>
-          <Box sx={{ mt: 1 }}>
+          <Box sx={{ m: 1 }}>
             <Button
               type="submit"
               variant={filter.iv === true ? "contained" : "outlined"}
               sx={{
-                ml: 2,
+                m: 1,
               }}
               onClick={() => setFilter({ ...filter, iv: !filter.iv })}>
               IV
@@ -145,7 +151,7 @@ function OptionsSettings({
               type="submit"
               variant={filter.pChange === true ? "contained" : "outlined"}
               sx={{
-                ml: 2,
+                m: 1,
               }}
               onClick={() =>
                 setFilter({ ...filter, pChange: !filter.pChange })
@@ -156,7 +162,7 @@ function OptionsSettings({
               type="submit"
               variant={filter.price === true ? "contained" : "outlined"}
               sx={{
-                ml: 2,
+                m: 1,
               }}
               onClick={() => setFilter({ ...filter, price: !filter.price })}>
               LTP
@@ -165,7 +171,7 @@ function OptionsSettings({
               type="submit"
               variant={filter.bidAsk === true ? "contained" : "outlined"}
               sx={{
-                ml: 2,
+                m: 1,
               }}
               onClick={() => setFilter({ ...filter, bidAsk: !filter.bidAsk })}>
               Bid/ASK

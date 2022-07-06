@@ -2,15 +2,25 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 function CurrentDataCard({ ltp, data }) {
   return (
-    <Box sx={{ height: "195px", display: "flex" }}>
-      <Typography varient="h1" sx={{ fontSize: "1.5rem", fontWeight: "500" }}>
-        {data && data[0].CE.underlying}
-      </Typography>
+    <Box>
       <Typography
-        varient="h1"
-        sx={{ fontSize: "1.5rem", fontWeight: "600", ml: 3 }}>
-        {data && ltp}
+        variant="subtitle"
+        sx={{ fontSize: "0.9rem", fontWeight: 400 }}>
+        Current Data
       </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          mt: 1,
+        }}>
+        <Typography varient="h1" sx={{ fontSize: "1.8rem", fontWeight: "500" }}>
+          {data && data[0].CE.underlying}
+        </Typography>
+        <Typography varient="h1" sx={{ fontSize: "6rem", fontWeight: "600" }}>
+          {data && ltp}
+        </Typography>
+      </Box>
     </Box>
   );
 }
