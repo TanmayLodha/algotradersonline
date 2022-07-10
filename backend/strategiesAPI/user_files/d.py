@@ -150,7 +150,7 @@ def main():
         sh = wrkbk.active
         rows_num = row_count(sh)
         print(f'1MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
-        x = rows_num - 82
+        x = rows_num - len(instrument_list)
         for y in range(len(instrument_list)):
             name = sh.cell(row=x, column=2).value
             if name == 'BANKNIFTY JUL FUT':
@@ -241,15 +241,14 @@ def start_paper_trade():
         sh = wrkbk.active
         rows_num = row_count(sh)
         # print(rows_num)
-        x = rows_num - 81
+        x = rows_num - 84
         print(f'1MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
             name = sh.cell(row=x, column=2).value
-            if name == 'BANKNIFTY JUL FUT':
+            if name == 'BANKNIFTY JUL FUT' or name == 'NIFTY JUL FUT':
                 y -= 1
                 x += 1
                 continue
-
             vo = df_historical['volume'][y]
             vol = sh.cell(row=x, column=3).value
             open = sh.cell(row=x, column=4).value
@@ -266,30 +265,29 @@ def start_paper_trade():
             h1 = high + high * 0.1 / 100
             quantity_b = int(money / h1)
             quantity_s = int(money / l1)
-            # print(f'{name} {vol} {vo}')
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and (
                     vol > vo) and (open < close)
                     and (range_oc2 > range_hl2 * 0.90) and (close > atp)):
-                # traded_stocks.append(name)
                 stop_loss = high + 0.5 - (high - low) / 2
                 square_off = (high - low)
                 print(f"Entry {name} {vol} {vo}")
                 TradedStocks.objects.create(username=algotrade_username, stock_name=name)
                 Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                           username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
-                                          buy_price=high + 0.5, sell_price=0, stop_loss=stop_loss, target=square_off)
+                                          buy_price=high + 0.5, sell_price=0, stop_loss=stop_loss, target=square_off,
+                                          historical_volume=vo, current_volume=vol)
 
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and (
                     vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.90) and (close < atp)):
                 print(f"Exit {name} {vol} {vo}")
-                # traded_stocks.append(name)
                 stop_loss = low - 0.5 + (high - low) / 2
                 square_off = (high - low)
                 TradedStocks.objects.create(username=algotrade_username, stock_name=name)
 
                 Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                           username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
-                                          buy_price=0, sell_price=low - 0.5, stop_loss=stop_loss, target=square_off)
+                                          buy_price=0, sell_price=low - 0.5, stop_loss=stop_loss, target=square_off,
+                                          historical_volume=vo, current_volume=vol)
 
             x += 1
             wrkbk.close()

@@ -97,7 +97,6 @@ def event_handler_quote_update(message):
         },
         index=[0])
     df = pd.concat([df, df_new], ignore_index=True)
-    print(f"{instrument} : {ltp} : {timestamp} : {vol} {atp}")
 
 
 def open_callback():
@@ -110,7 +109,7 @@ def create_ohlc():
     start = time.time()
     global df
     copydf = df.copy(deep=True).drop_duplicates()
-    df = pd.DataFrame()
+    df = df.iloc[0:0]
     get_ohlc(copydf)
     interval = ORB_timeFrame - (time.time() - start)
     print(
@@ -131,8 +130,6 @@ def get_ohlc(dataframe):
         engine='openpyxl')
     writer.book = book
     writer.sheets = {ws.title: ws for ws in book.worksheets}
-
-    x = 1
     for name, group in grouped:
         group = group.sort_values('timestamp')
         timestamp = group['timestamp'].iloc[0]

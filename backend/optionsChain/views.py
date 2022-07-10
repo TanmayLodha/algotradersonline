@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from strategiesAPI.models import LTP
-from strategiesAPI.serializers import LTPSerializer
+from .models import LTP
+from .serializers import LTPSerializer
 import requests
 import json
 
@@ -71,3 +71,17 @@ def option_data(request):
         data = [d for d in options["data"] if d["expiryDate"] == date]
 
     return Response([data, expiry_dates, [serializer.data]], status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def get_ltp(request):
+    try:
+        instrument = request.data['instrument']
+        queryset = LTP.objects.none()
+        for i in instrument:
+            queryset |= LTP.objects.all().filter(name=i)
+        serializer = LTPSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except KeyError:
+        return Response({'response: Provided Instrument does not exist'},
+                        status=status.HTTP_400_BAD_REQUEST)

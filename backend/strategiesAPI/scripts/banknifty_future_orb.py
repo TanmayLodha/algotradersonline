@@ -8,12 +8,11 @@ import requests
 import openpyxl
 import re
 import django
-
 django.setup()
 from ..models import Papertrade
 
 traded_stocks = []
-instrument_list = ['BANKNIFTY JUL FUT']
+instrument_list = ['BANKNIFTY JUL FUT', 'NIFTY JUL FUT']
 
 access_token = AliceBlue.login_and_get_access_token(username=username,
                                                     password=password,
@@ -164,7 +163,8 @@ def row_count(ws):
 #                                   trailing_sl=None,
 #                                   is_amo=False)
 
-#             if (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80) and (close < atp):
+#             if (name not in traded_stocks) and (vol > vo) and (open > close) and
+#             (range_oc1 > range_hl1 * 0.80) and (close < atp):
 #                 print(f"Exit {name} {name} {vol} {vo}")
 #                 traded_stocks.append(name)
 #                 alice.place_order(transaction_type=TransactionType.Sell,
@@ -189,12 +189,13 @@ def start_paper_trade():
     global df_historical
     # noinspection PyGlobalUndefined
     global algotrade_username
-
-    name = instrument_list[0]
-    high, low = test(name)
-    data = {'symbol': name, 'high': high, 'low': low}
-    df_historical = pd.DataFrame(data, index=[0])
-    print(f"{df_historical['symbol'][0]}  {df_historical['high'][0]} {df_historical['low'][0]}")
+    for x in range(len(instrument_list)):
+        name = instrument_list[x]
+        high, low = test(name)
+        data = {'symbol': name, 'high': high, 'low': low}
+        df_histo = pd.DataFrame(data, index=[x])
+        df_historical = pd.concat([df_historical, df_histo])
+        print(f"{df_historical['symbol'][x]}  {df_historical['high'][x]} {df_historical['low'][x]}")
 
     while datetime.datetime.now().time() < datetime.time(9, 30, 00):
         pass
@@ -209,33 +210,36 @@ def start_paper_trade():
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
-        # print(rows_num)
-        print(f'BANKNIFTY candle at {datetime.datetime.now().time().strftime("%H:%M")}')
-        for x in range(rows_num - 82, rows_num):
+        y = 0
+        print(f'FUTURES candle at {datetime.datetime.now().time().strftime("%H:%M")}')
+        for x in range(rows_num-84, rows_num):
             name = sh.cell(row=x, column=2).value
-            if name == "BANKNIFTY JUL FUT":
-                hi = df_historical['high'][0]
-                lo = df_historical['low'][0]
+            if name == "BANKNIFTY JUL FUT" or name == 'NIFTY JUL FUT':
+                hi = df_historical['high'][y]
+                lo = df_historical['low'][y]
+                y += 1
+
                 close = sh.cell(row=x, column=5).value
                 high = sh.cell(row=x, column=6).value
                 low = sh.cell(row=x, column=7).value
+
                 if (name not in traded_stocks) and close > hi:
                     traded_stocks.append(name)
-                    stop_loss = high - 30
+                    stop_loss = hi-30
                     square_off = 100
                     print(f"Entry {name} {high} {hi}")
                     Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                               username=algotrade_username, signal='BUY', name=name, quantity=50,
-                                              buy_price=high + 20, sell_price=0, stop_loss=stop_loss, target=square_off)
+                                              buy_price=hi+20, sell_price=0, stop_loss=stop_loss, target=square_off)
 
                 if (name not in traded_stocks) and close < lo:
                     print(f"Exit {name} {low} {lo}")
                     traded_stocks.append(name)
-                    stop_loss = low + 30
+                    stop_loss = lo + 30
                     square_off = 100
                     Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                               username=algotrade_username, signal='SELL', name=name, quantity=50,
-                                              buy_price=0, sell_price=low - 20, stop_loss=stop_loss, target=square_off)
+                                              buy_price=0, sell_price=lo-20, stop_loss=stop_loss, target=square_off)
 
         wrkbk.close()
         interval = 60 - time.time() + start

@@ -10,25 +10,28 @@ from config1 import Credentials
 import sys
 import os
 import django
+
 sys.path.append("/Users/nitishgupta/Desktop/algoTrade/backend")
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
-from strategiesAPI.models import LTP
-
+from strategiesAPI.models import Papertrade
+from optionsChain.models import LTP
 
 SCRIPT_LIST = [
-    'ACC', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT', 'AUBANK',
-    'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE', 'BATAINDIA', 'BHARATFORG',
-    'BHARTIARTL', 'BIOCON', 'BPCL', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE', 'DABUR',
-    'DIVISLAB', 'DLF', 'DRREDDY', 'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HAVELLS',
-    'HCLTECH', 'HDFC', 'HDFCBANK', 'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
-    'HINDUNILVR', 'ICICIBANK', 'ICICIPRULI', 'IGL', 'INDIGO', 'INDUSINDBK', 'INFY',
-    'IRCTC', 'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'LICHSGFIN',
-    'LT', 'LTI', 'LUPIN', 'M&M', 'MARUTI', 'MINDTREE', 'MUTHOOTFIN', 'Nifty 50', 'Nifty Bank',
-    'PEL', 'PIDILITIND', 'PVR', 'RELIANCE', 'SBICARD', 'SBILIFE', 'SBIN', 'SRF',
-    'SRTRANSFIN', 'SUNPHARMA', 'TATACHEM', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER',
-    'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TVSMOTOR', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO',
-    'ZEEL']
+    'ACC', 'ADANIENT', 'ADANIPORTS', 'AMBUJACEM', 'APOLLOHOSP', 'ASIANPAINT',
+    'AUBANK', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJFINANCE',
+    'BATAINDIA', 'BHARATFORG', 'BHARTIARTL', 'BIOCON', 'BPCL', 'CHOLAFIN',
+    'CIPLA', 'COALINDIA', 'COFORGE', 'DABUR', 'DIVISLAB', 'DLF', 'DRREDDY',
+    'EICHERMOT', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HAVELLS', 'HCLTECH',
+    'HDFC', 'HDFCBANK', 'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO',
+    'HINDUNILVR', 'ICICIBANK', 'ICICIPRULI', 'IGL', 'INDIGO', 'INDUSINDBK',
+    'INFY', 'IRCTC', 'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK',
+    'LICHSGFIN', 'LT', 'LTI', 'LUPIN', 'M&M', 'MARUTI', 'MINDTREE',
+    'MUTHOOTFIN', 'Nifty 50', 'Nifty Bank', 'PEL', 'PIDILITIND', 'PVR',
+    'RELIANCE', 'SBICARD', 'SBILIFE', 'SBIN', 'SRF', 'SRTRANSFIN', 'SUNPHARMA',
+    'TATACHEM', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER', 'TATASTEEL', 'TCS',
+    'TECHM', 'TITAN', 'TVSMOTOR', 'UPL', 'VEDL', 'VOLTAS', 'WIPRO', 'ZEEL'
+]
 
 socket_opened = False
 df = pd.DataFrame()
@@ -60,24 +63,39 @@ def login():
     while not socket_opened:
         pass
 
-    alice.subscribe([
-        alice.get_instrument_by_symbol('NSE', i) for i in SCRIPT_LIST
-    ], LiveFeedType.MARKET_DATA)
+    alice.subscribe(
+        [alice.get_instrument_by_symbol('NSE', i) for i in SCRIPT_LIST],
+        LiveFeedType.MARKET_DATA)
 
-    alice.subscribe(alice.get_instrument_for_fno(symbol = 'BANKNIFTY', expiry_date=datetime.date(2022, 7, 28), is_fut=True, strike=None, is_CE = False)
-    , LiveFeedType.MARKET_DATA)
+    alice.subscribe(
+        alice.get_instrument_for_fno(symbol='BANKNIFTY',
+                                     expiry_date=datetime.date(2022, 7, 28),
+                                     is_fut=True,
+                                     strike=None,
+                                     is_CE=False), LiveFeedType.MARKET_DATA)
+    alice.subscribe(
+        alice.get_instrument_for_fno(symbol='NIFTY',
+                                     expiry_date=datetime.date(2022, 7, 28),
+                                     is_fut=True,
+                                     strike=None,
+                                     is_CE=False), LiveFeedType.MARKET_DATA)
+
 
 def event_handler_quote_update(message):
     ltp = message['ltp']
     instrument = message['instrument'].symbol
 
-    # update live LTP to database
-    q = LTP.objects.get(name=instrument)
-    q.ltp = ltp
+    # update live LTP to option chain database
+    qt = LTP.objects.get(name=instrument)
+    qt.ltp = ltp
+    qt.save()
+
+    # update required LTP to papertrade database
+    q = Papertrade.objects.filter(name=instrument).filter(isCompleted=False)
+    q.update(ltp=ltp)
     q.save()
 
     timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
-    # timestamp = datetime.datetime.fromtimestamp(message['exchange_time_stamp'])
     vol = message['volume']
     exchange = message['instrument'].exchange
     high = message['high']
@@ -93,12 +111,10 @@ def event_handler_quote_update(message):
             'high': high,
             'low': low,
             'exchange': exchange,
-            'atp':atp
+            'atp': atp
         },
         index=[0])
     df = pd.concat([df, df_new], ignore_index=True)
-
-    # print(f"{instrument} : {ltp} : {timestamp} : {vol} : {atp}")
 
 
 def open_callback():
@@ -124,12 +140,11 @@ def create_ohlc():
 
 def get_ohlc(dataframe):
     grouped = dataframe.groupby('symbol')
-    # for key, item in grouped:
-    #     print(grouped.get_group(key), "\n\n")
     global df_final
     global x
     book = load_workbook(
-        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
+        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx'
+    )
     writer = pd.ExcelWriter(
         f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx',
         engine='openpyxl')
@@ -161,21 +176,23 @@ def get_ohlc(dataframe):
         }
 
         df_append = pd.DataFrame(data, index=[0])
-        df_append.to_excel(writer, header=False, index=False, startrow=x, startcol=0)
+        df_append.to_excel(writer,
+                           header=False,
+                           index=False,
+                           startrow=x,
+                           startcol=0)
         x += 1
     writer.save()
     book.close()
 
 
 if __name__ == '__main__':
-    while ((datetime.datetime.now().time() <= datetime.time(9, 14, 00))
-           or (datetime.datetime.now().time() >= datetime.time(15, 30, 00))):
-        pass
+    # while ((datetime.datetime.now().time() <= datetime.time(9, 14, 00))
+    #        or (datetime.datetime.now().time() >= datetime.time(15, 30, 00))):
+    #     pass
 
     login()
     main_interval = ORB_timeFrame - datetime.datetime.now().second
-    # interval = (5 - datetime.datetime.now().minute % 5) * 60 - (
-    # datetime.datetime.now().second)
     print("start in ", main_interval)
     time.sleep(main_interval)
     create_ohlc()

@@ -95,7 +95,6 @@ def test(i):
     to_datetime = date_end - datetime.timedelta(
         days=1)
     interval1 = "5_MIN"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
-
     indices = False
     df1 = pd.DataFrame(
         get_historical(instrument, from_datetime, to_datetime, interval1,
@@ -126,11 +125,10 @@ def main():
     while datetime.datetime.now().time() < datetime.time(9, 19, 00):
         pass
     interval = (5 - datetime.datetime.now().minute % 5) * 60 - datetime.datetime.now().second
-
     time.sleep(interval + 2)
 
-    while ((datetime.time(9, 20, 0) <= datetime.datetime.now().time()
-            <= datetime.time(15, 0, 0))):
+    while ((datetime.time(9, 20, 5) <= datetime.datetime.now().time()
+            <= datetime.time(15, 25, 5))):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
             f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
@@ -175,7 +173,7 @@ def main():
                                   is_amo=False)
 
             if ((name not in traded_stocks) and (vol > vo) and (open > close)
-                    and (range_oc1 > range_hl1 * 0.80) and (open - close < 0.03 * open) and (close < atp) ):
+                    and (range_oc1 > range_hl1 * 0.80) and (open - close < 0.03 * open) and (close < atp)):
                 print(f"Exit {name} {name} {vol} {vo}")
                 traded_stocks.append(name)
                 alice.place_order(transaction_type=TransactionType.Sell,
@@ -220,6 +218,7 @@ def start_paper_trade():
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
+
         x = rows_num - 80
         print(f'5MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
@@ -244,27 +243,27 @@ def start_paper_trade():
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and
                     (vol > vo) and (open < close) and (range_oc2 > range_hl2 * 0.80) and (close - open < 0.03 * open)
                     and (close > atp)):
-                print(f"Entry {name} {vol} {vo}")
+                TradedStocks.objects.create(username=algotrade_username, stock_name=name)
                 stop_loss = close - (high-low)
                 square_off = high - low
-                TradedStocks.objects.create(username=algotrade_username, stock_name=name)
+                print(f"Entry {name} {vol} {vo}")
                 Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                           username=algotrade_username, signal='BUY', name=name, quantity=quantity_b,
                                           buy_price=high+((high-low)/4), sell_price=0, stop_loss=stop_loss,
-                                          target=square_off)
+                                          target=square_off, historical_volume=vo, current_volume=vol)
 
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and
                     (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80) and (open - close < 0.03 * open)
                     and (close < atp)):
-                print(f"Exit {name} {vol} {vo}")
+                TradedStocks.objects.create(username=algotrade_username, stock_name=name)
                 stop_loss = close + (high-low)
                 square_off = high - low
-                TradedStocks.objects.create(username=algotrade_username, stock_name=name)
+                print(f"Exit {name} {vol} {vo}")
                 Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
                                           username=algotrade_username, signal='SELL', name=name, quantity=quantity_s,
                                           buy_price=0, sell_price=low-((high-low)/4), stop_loss=stop_loss,
-                                          target=square_off)
+                                          target=square_off, historical_volume=vo, current_volume=vol)
             x += 1
-        wrkbk.close()
+            wrkbk.close()
         interval = 300 - time.time() + start
         time.sleep(interval)
