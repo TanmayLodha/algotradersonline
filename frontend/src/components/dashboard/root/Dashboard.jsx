@@ -44,7 +44,27 @@ function Dashboard() {
   //security Issue check local.storage
   const navigate = useNavigate();
   const logout = () => {
-    localStorage.removeItem("user");
+    fetch(BaseURL + "api/logout/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${current.data.token}`,
+      },
+    })
+      .then((response) => {
+        if (response.ok === true) return response.json();
+        else {
+          throw new Error();
+        }
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    localStorage.clear();
     setUser(null);
     navigate("", { replace: true });
   };
@@ -109,7 +129,10 @@ function Dashboard() {
   useEffect(() => {
     fetch(BaseURL + "api/strategies/", {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${current.data.token}`,
+      },
     })
       .then((response) => {
         if (response.ok) return response.json();
@@ -118,6 +141,7 @@ function Dashboard() {
         setStrategies(data);
       })
       .catch((error) => {});
+    // eslint-disable-next-line
   }, []);
 
   const providerValue = useMemo(() => ({ strategies }), [strategies]);

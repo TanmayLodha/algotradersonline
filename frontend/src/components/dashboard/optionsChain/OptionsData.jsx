@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Card, Grid, Snackbar, Alert } from "@mui/material";
 import OptionsSettings from "./OptionsSettings";
 import OptionsTable from "./OptionsTable";
 import CurrentDataCard from "./CurrentDataCard";
 import { BaseURL } from "../../../BaseURL";
+import { UserContext } from "../../../UserContext";
 
 function OptionsData() {
+  const { user } = useContext(UserContext);
+  const cUser = JSON.parse(user);
   const [data, setData] = useState(null);
   const [expiryDates, setExpiryDates] = useState([]);
   const [ltp, setltp] = useState("");
@@ -34,7 +37,10 @@ function OptionsData() {
     }
     fetch(BaseURL + "api/options_data/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${cUser.data.token}`,
+      },
       body: JSON.stringify(request),
     })
       .then((response) => {

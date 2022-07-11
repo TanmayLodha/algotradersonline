@@ -2,13 +2,11 @@
 import { BaseURL } from "../../../BaseURL";
 
 export const createFile = (props, current) => {
-
-    const request = { username: current.data.username };
     console.log("createFile")
     fetch(BaseURL + `api/strategies/${props.id}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
+        method: "GET",
+        headers: { "Content-Type": "application/json", Authorization: `Token ${current.data.token}`, },
+
     })
         .then((response) => {
             if (response.ok === true) return response.json();

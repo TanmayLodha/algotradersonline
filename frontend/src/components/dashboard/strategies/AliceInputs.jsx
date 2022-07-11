@@ -79,7 +79,7 @@ const AliceInputs = ({ close, strategy, succ }) => {
       .then((data) => {
         createFile(strategy, current);
         execfile(current);
-        setTimeout(5000); //Check this timeout
+        setTimeout(execfile, 5000, current);
         close();
       })
       .catch((error) => {

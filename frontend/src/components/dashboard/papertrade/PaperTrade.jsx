@@ -20,13 +20,12 @@ function PaperTrade() {
   };
 
   const getData = () => {
-    const request = {
-      username: current.data.username,
-    };
     fetch(BaseURL + "api/get_trades/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${current.data.token}`,
+      },
     })
       .then((response) => {
         if (response.ok === true) return response.json();
@@ -35,7 +34,6 @@ function PaperTrade() {
         }
       })
       .then((data) => {
-        console.log(data);
         setActiveData(
           data.filter((a) => {
             return a.isActive === true && a.isCompleted === false;
@@ -95,7 +93,7 @@ function PaperTrade() {
               boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
               transition: " all .15s ease-in-out",
             }}>
-            <BoxTwo submit={submit} setSubmit={setSubmit} />
+            <BoxTwo submit={submit} setSubmit={setSubmit} current={current} />
           </Card>
         </Grid>
         <Grid item xs={12}>

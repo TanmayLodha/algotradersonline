@@ -13,13 +13,11 @@ import {
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { BaseURL } from "../../../BaseURL";
 import { createFile } from "../strategies/createFile";
-import { UserContext } from "../../../UserContext";
 import { StrategiesContext } from "../../../StrategiesContext";
 
-function BoxTwo({ submit, setSubmit }) {
+function BoxTwo({ submit, setSubmit, current }) {
   const { strategies } = useContext(StrategiesContext);
-  const { user } = useContext(UserContext);
-  const current = JSON.parse(user);
+
   const [open, setOpen] = useState(false);
   const snackBarClose = () => {
     setOpen(false);
@@ -37,11 +35,12 @@ function BoxTwo({ submit, setSubmit }) {
   };
 
   const handleStop = () => {
-    const request = { username: current.data.username };
     fetch(BaseURL + "api/stop_trades/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${current.data.token}`,
+      },
     })
       .then((response) => {
         if (response.ok === true) return response.json();
@@ -142,11 +141,12 @@ function BoxTwo({ submit, setSubmit }) {
 }
 
 const execPaperTrade = (current, setOpen) => {
-  const request = { username: current.data.username };
   fetch(BaseURL + "api/paper_trade/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${current.data.token}`,
+    },
   })
     .then((response) => {
       if (response.ok === true) return response.json();

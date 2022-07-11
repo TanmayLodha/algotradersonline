@@ -94,7 +94,7 @@ const Register = () => {
       email: newuser.email,
       aliceBlueID: newuser.demat,
     };
-    console.log(JSON.stringify(credentials));
+
     fetch(BaseURL + "api/register/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -335,7 +335,7 @@ const Register = () => {
                     fontWeight: 500,
                     color: "primary.main",
                   }}>
-                  Sign in insted
+                  Sign in instead
                 </Typography>
               </Link>
             </Typography>

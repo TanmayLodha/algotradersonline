@@ -8,11 +8,33 @@ import {
   CardActions,
   Button,
 } from "@mui/material";
+import { BaseURL } from "../../../BaseURL";
 
 const LogoutCheck = ({ close, toggle }) => {
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+  const current = JSON.parse(user);
   const navigate = useNavigate();
   const handlelogout = () => {
+    fetch(BaseURL + "api/logout/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${current.data.token}`,
+      },
+    })
+      .then((response) => {
+        if (response.ok === true) return response.json();
+        else {
+          throw new Error();
+        }
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
     localStorage.clear();
     setUser(null);
     navigate("", { replace: true });
