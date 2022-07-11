@@ -8,6 +8,7 @@ import {
   Typography,
   Button,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { SCRIPT_LIST } from "./scriptList";
 
 function OptionsSettings({
@@ -15,15 +16,15 @@ function OptionsSettings({
   expiryDates,
   filter,
   setFilter,
-  ltp,
-  data,
+  currentDate,
+  loading,
 }) {
   const [val, setVal] = useState("");
   const [date, setDate] = useState("");
   const [stock, setStock] = useState("");
   useEffect(() => {
-    setDate(expiryDates.length === 0 ? "" : expiryDates[0]);
-  }, [expiryDates]);
+    setDate(expiryDates.length === 0 ? "" : currentDate);
+  }, [expiryDates, currentDate]);
 
   const handleValChange = (event) => {
     setStock("");
@@ -117,8 +118,9 @@ function OptionsSettings({
               })}
             </Select>
           </FormControl>
-          <Button
+          <LoadingButton
             disabled={val !== "" || stock !== "" ? false : true}
+            loading={loading}
             type="submit"
             variant="contained"
             sx={{
@@ -127,7 +129,7 @@ function OptionsSettings({
             }}
             onClick={() => handleSubmit(val, stock, date)}>
             Fetch
-          </Button>
+          </LoadingButton>
         </Box>
 
         <Box sx={{ mt: 2 }}>

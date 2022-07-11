@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import {
   Typography,
   Select,
@@ -14,36 +14,27 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { BaseURL } from "../../../BaseURL";
 import { createFile } from "../strategies/createFile";
 import { UserContext } from "../../../UserContext";
+import { StrategiesContext } from "../../../StrategiesContext";
 
-function BoxTwo() {
-  const [strategies, setStrategies] = useState([]);
-  // dropdown states
-  const [strat, setStrat] = React.useState({ id: "" });
+function BoxTwo({ submit, setSubmit }) {
+  const { strategies } = useContext(StrategiesContext);
+  const { user } = useContext(UserContext);
+  const current = JSON.parse(user);
+  const [open, setOpen] = useState(false);
+  const snackBarClose = () => {
+    setOpen(false);
+  };
+
+  const [strat, setStrat] = useState({ id: "" });
   const handleChange = (event) => {
     setStrat({ id: event.target.value });
   };
-
-  const { user } = useContext(UserContext);
-  const current = JSON.parse(user);
-  const [submit, setSubmit] = useState(false);
 
   const handleSubmit = () => {
     createFile(strat, current);
     setTimeout(execPaperTrade, 3000, current, setOpen);
     setSubmit(!submit);
   };
-
-  // useEffect(() => {
-  //   const u = JSON.parse(localStorage.getItem("submit"));
-  //   const v = JSON.parse(localStorage.getItem("strat"));
-  //   setSubmit(u);
-  //   setStrat(v);
-  // }, []);
-
-  // useEffect(() => {
-  //   localStorage.setItem("submit", submit);
-  //   localStorage.setItem("strat", JSON.stringify(strat));
-  // }, [submit, strat]);
 
   const handleStop = () => {
     const request = { username: current.data.username };
@@ -67,24 +58,6 @@ function BoxTwo() {
     setSubmit(!submit);
   };
 
-  useEffect(() => {
-    fetch(BaseURL + "api/strategies/", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => {
-        if (response.ok) return response.json();
-      })
-      .then((data) => {
-        setStrategies(data);
-      })
-      .catch((error) => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const [open, setOpen] = useState(false);
-  const snackBarClose = () => {
-    setOpen(false);
-  };
   return (
     <>
       <Snackbar
@@ -136,21 +109,7 @@ function BoxTwo() {
             sx={{ fontSize: "1rem", fontWeight: 400, ml: 2 }}>
             <ArrowForwardIcon />
           </Typography>
-          {/* <TextField
-            disabled={submit}
-            required
-            label="Amount you want to spend"
-            type="text"
-            name="Money"
-            value={current.money}
-            onChange={(e) => setCurrent({ ...current, money: e.target.value })}
-            sx={{ ml: 2, width: 250 }}
-          />
-          <Typography
-            variant="subtitle"
-            sx={{ fontSize: "1rem", fontWeight: 400, ml: 2 }}>
-            <ArrowForwardIcon />
-          </Typography> */}
+
           {!submit ? (
             <Button
               type="submit"

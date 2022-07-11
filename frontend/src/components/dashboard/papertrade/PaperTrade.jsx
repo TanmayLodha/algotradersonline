@@ -1,34 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Card, Grid } from "@mui/material";
 import BoxOne from "./BoxOne";
 import BoxTwo from "./BoxTwo";
 import BoxThree from "./BoxThree";
+import { BaseURL } from "../../../BaseURL";
+import { UserContext } from "../../../UserContext";
 
 function PaperTrade() {
-  const [paperMoney, setPaperMoney] = useState(0);
+  const { user } = useContext(UserContext);
+  const current = JSON.parse(user);
+  const [submit, setSubmit] = useState(false);
+  const [activeData, setActiveData] = useState([]);
+  const [achievedData, setAchievedData] = useState([]);
+  const [pendingData, setPendingData] = useState([]);
+  const [value, setValue] = useState(0);
 
-  const updateMoney = (value) => {
-    //https://stackoverflow.com/questions/16037165/displaying-a-number-in-indian-format-using-javascript
-    let x = value;
-    x = x.toString();
-    var afterPoint = "";
-    if (x.indexOf(".") > 0) afterPoint = x.substring(x.indexOf("."), x.length);
-    x = Math.floor(x);
-    x = x.toString();
-    var lastThree = x.substring(x.length - 3);
-    var otherNumbers = x.substring(0, x.length - 3);
-    if (otherNumbers !== "") lastThree = "," + lastThree;
-    var res =
-      otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") +
-      lastThree +
-      afterPoint;
-    setPaperMoney(res);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
   };
+
+  const getData = () => {
+    const request = {
+      username: current.data.username,
+    };
+    fetch(BaseURL + "api/get_trades/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    })
+      .then((response) => {
+        if (response.ok === true) return response.json();
+        else {
+          throw new Error();
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        setActiveData(
+          data.filter((a) => {
+            return a.isActive === true && a.isCompleted === false;
+          })
+        );
+        setPendingData(
+          data.filter((a) => {
+            return a.isActive === false;
+          })
+        );
+
+        setAchievedData(
+          data.filter((a) => {
+            return a.isCompleted === true;
+          })
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  let total =
+    achievedData.length !== 0
+      ? achievedData.reduce((total, obj) => obj.net_pl + total, 0)
+      : 0;
+
+  useEffect(() => {
+    getData();
+    const interval = setInterval(() => {
+      getData();
+    }, 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <>
       <Grid container spacing={2} sx={{ mt: 1 }}>
-        <Grid item xs={4}>
+        <Grid item xs={6}>
           <Card
             sx={{
               p: 2,
@@ -37,10 +84,10 @@ function PaperTrade() {
               boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
               transition: " all .15s ease-in-out",
             }}>
-            <BoxOne paperMoney={paperMoney} />
+            <BoxOne achievedData={achievedData} total={total} />
           </Card>
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           <Card
             sx={{
               p: 2,
@@ -48,7 +95,7 @@ function PaperTrade() {
               boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
               transition: " all .15s ease-in-out",
             }}>
-            <BoxTwo />
+            <BoxTwo submit={submit} setSubmit={setSubmit} />
           </Card>
         </Grid>
         <Grid item xs={12}>
@@ -60,7 +107,15 @@ function PaperTrade() {
               boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
               transition: " all .15s ease-in-out",
             }}>
-            <BoxThree updateMoney={updateMoney} />
+            <BoxThree
+              submit={submit}
+              pendingData={pendingData}
+              activeData={activeData}
+              achievedData={achievedData}
+              value={value}
+              handleChange={handleChange}
+              total={total}
+            />
           </Card>
         </Grid>
       </Grid>

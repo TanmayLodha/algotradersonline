@@ -1,17 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { Typography } from "@mui/material";
-function BoxOne({ paperMoney }) {
+import { useEffect } from "react";
+function BoxOne({ achievedData, total }) {
+  const [paperMoney, setPaperMoney] = useState(0);
+  useEffect(() => {
+    setPaperMoney(
+      (achievedData.length * 100000 + total).toLocaleString("en-IN", {
+        maximumFractionDigits: 2,
+        style: "currency",
+        currency: "INR",
+      })
+    );
+  }, [paperMoney, total, achievedData]);
   return (
     <>
       <Typography
         variant="subtitle"
         sx={{ fontSize: "0.9rem", fontWeight: 400 }}>
-        Net Paper Account Value
+        Paper Account Value
       </Typography>
       <Typography
         variant="h1"
         sx={{ fontSize: "3rem", fontWeight: 600, mt: 2 }}>
-        ₹ {paperMoney}
+        {paperMoney}
       </Typography>
     </>
   );

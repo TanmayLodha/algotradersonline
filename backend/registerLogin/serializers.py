@@ -21,3 +21,13 @@ class RegisterSerializer(serializers.ModelSerializer):
                                               password=self.validated_data['password'],
                                               aliceBlueID=self.validated_data['aliceBlueID'])
         return user
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = CustomUser
+
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

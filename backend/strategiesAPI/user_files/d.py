@@ -1,6 +1,6 @@
 # config
 username = "411686"
-password = "kaku4567"
+password = "ajeet302031"
 app_id = "SX5Vs0UiCE"
 api_secret = "NfL6k8K82kryxfAusAtUOsLUdJzSY7TjrHvMmrsO22WHiRTOuc4QCKGMw27C1uly"
 twoFA = "1979"

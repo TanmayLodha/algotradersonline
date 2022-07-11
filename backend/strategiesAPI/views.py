@@ -1,12 +1,13 @@
 from .serializers import StrategiesSerializer, CredentialSerializer, PapertradeSerializer
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from .models import Strategies, Papertrade
 from registerLogin.models import CustomUser
 from rest_framework import status
 import importlib
 import multiprocessing
 import datetime
+from rest_framework.permissions import IsAuthenticated
 from datetime import datetime, timedelta
 
 process_list = {}
@@ -28,11 +29,12 @@ def post_cred(request):
                     status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def make_file(request, pk):
     try:
         detail = Strategies.objects.get(pk=pk)
-        username = request.data["username"]
+        username = request.user
         cred = CustomUser.objects.select_related('credentials').get(
             username=username)
 
@@ -64,11 +66,12 @@ def make_file(request, pk):
             status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def execute_strategy(request):
     global process_list
     try:
-        username = request.data['username']
+        username = request.user
         file = f"strategiesAPI.user_files.{username}"
         mod = importlib.import_module(file)
         t = multiprocessing.Process(target=mod.main)
@@ -85,11 +88,12 @@ def execute_strategy(request):
             status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def stop_strategy(request):
     global process_list
     try:
-        username = request.data['username']
+        username = request.user
         process_list[username].terminate()
         del process_list[username]
         print(process_list)
@@ -103,19 +107,12 @@ def stop_strategy(request):
             status=status.HTTP_400_BAD_REQUEST)
 
 
-# noinspection PyUnusedLocal
 @api_view(['GET'])
-def list_strategies(request):
-    queryset = Strategies.objects.all()
-    serializer = StrategiesSerializer(queryset, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def execute_paper_trade(request):
     global process_list
     try:
-        username = request.data['username']
+        username = request.user
         file = f"strategiesAPI.user_files.{username}"
         mod = importlib.import_module(file)
         t = multiprocessing.Process(target=mod.start_paper_trade)
@@ -132,10 +129,12 @@ def execute_paper_trade(request):
             status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_paper_trades(request):
     try:
-        username = request.data['username']
+        username = request.user
+
         start_date = datetime.today()
         end_date = datetime.today()
         queryset = Papertrade.objects.all().filter(username=username).filter(
@@ -156,9 +155,11 @@ def get_paper_trades(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def get_summary(request):
     try:
-        username = request.data['username']
+        username = request.user
+        print(request.user)
         delta = request.data['delta']
         if delta == -1:
             queryset = Papertrade.objects.all().filter(username=username).filter(
@@ -174,15 +175,16 @@ def get_summary(request):
     except KeyError:
         return Response(
             {
-                'response": "Oops. Your have given a wrong field. "username" expected'
+                'response": "Invalid field. "delta" expected'
             },
             status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def stop_paper_trades(request):
     try:
-        username = request.data['username']
+        username = request.user
         process_list[username].terminate()
         del process_list[username]
         print(process_list)
@@ -196,3 +198,14 @@ def stop_paper_trades(request):
                 'response": "Oops. Your have given a wrong field. "username" expected'
             },
             status=status.HTTP_400_BAD_REQUEST)
+
+
+# noinspection PyUnusedLocal
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_strategies(request):
+    queryset = Strategies.objects.all()
+    serializer = StrategiesSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+

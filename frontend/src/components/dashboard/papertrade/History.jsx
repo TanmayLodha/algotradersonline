@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Typography,
   TableContainer,
@@ -10,11 +10,7 @@ import {
   TableFooter,
 } from "@mui/material";
 
-function History({ achievedData, updateMoney }) {
-  var [netPL, totalCharges, total] = updateTable(achievedData);
-  useEffect(() => {
-    updateMoney((achievedData.length * 100000 + total).toFixed(2));
-  }, [total, achievedData.length, updateMoney]);
+function History({ achievedData, total }) {
   return (
     <>
       {achievedData.length === 0 ? (
@@ -101,29 +97,25 @@ function History({ achievedData, updateMoney }) {
                     <TableCell>{row.quantity}</TableCell>
                     <TableCell>{row.buy_price}</TableCell>
                     <TableCell>{row.sell_price}</TableCell>
-                    {netPL[id] < 0 ? (
-                      <TableCell
-                        sx={{
-                          color: "red",
-                          fontSize: "1rem",
-                          fontWeight: 600,
-                        }}>
-                        {netPL[id].toFixed(2)}
-                      </TableCell>
-                    ) : (
-                      <TableCell
-                        sx={{
-                          color: "green",
-                          fontSize: "1rem",
-                          fontWeight: 600,
-                        }}>
-                        {netPL[id].toFixed(2)}
-                      </TableCell>
-                    )}
-                    <TableCell>{totalCharges[id].toFixed(2)}</TableCell>
+                    <TableCell
+                      sx={{ color: row.net_pl >= 0 ? "green" : "red" }}>
+                      {row.net_pl.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                        style: "currency",
+                        currency: "INR",
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      {row.net_charges.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                        style: "currency",
+                        currency: "INR",
+                      })}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
+
               <TableFooter>
                 <TableRow>
                   <TableCell colSpan={5} />
@@ -137,7 +129,13 @@ function History({ achievedData, updateMoney }) {
                   <TableCell
                     sx={{ fontSize: "1.2rem", fontWeight: 600 }}
                     colSpan={2}>
-                    ₹ {total.toFixed(2)}
+                    {achievedData.length !== 0
+                      ? total.toLocaleString("en-IN", {
+                          maximumFractionDigits: 2,
+                          style: "currency",
+                          currency: "INR",
+                        })
+                      : 0}
                   </TableCell>
                 </TableRow>
               </TableFooter>
@@ -148,58 +146,5 @@ function History({ achievedData, updateMoney }) {
     </>
   );
 }
-
-const updateTable = (activeData) => {
-  var turnover = 0;
-  var stt = 0;
-  const turnoverArr = activeData.map((row) => {
-    turnover = (row.buy_price + row.sell_price) * row.quantity;
-    return turnover;
-  });
-
-  const sttprice = activeData.map((row) => {
-    stt = row.sell_price * row.quantity * 0.00025;
-    return stt;
-  });
-  const brokerage = turnoverArr.map((item) => Math.min(item * 0.0001, 40));
-  const tranCharges = turnoverArr.map((item) => item * 0.0000325);
-  const sebiCharges = turnoverArr.map((item) => item * 0.000002);
-  const stampDuty = turnoverArr.map((item) => item * 0.0001);
-  const serviceTax = brokerage.map(
-    (item, id) => (item + tranCharges[id]) * 0.15
-  );
-
-  var totalcharge = 0;
-  const totalCharges = brokerage.map((item, id) => {
-    totalcharge =
-      item +
-      tranCharges[id] +
-      sebiCharges[id] +
-      stampDuty[id] +
-      serviceTax[id] +
-      sttprice[id];
-    return totalcharge;
-  });
-
-  var total = 0;
-  var stockNetpl = 0;
-  const netPL = activeData.map((row, id) => {
-    if (row.signal === "BUY") {
-      total +=
-        (row.sell_price - row.buy_price) * row.quantity - totalCharges[id];
-      stockNetpl =
-        (row.sell_price - row.buy_price) * row.quantity - totalCharges[id];
-    } else {
-      total +=
-        (row.sell_price - row.buy_price) * row.quantity - totalCharges[id];
-      stockNetpl =
-        (row.sell_price - row.buy_price) * row.quantity - totalCharges[id];
-    }
-
-    return stockNetpl;
-  });
-
-  return [netPL, totalCharges, total];
-};
 
 export default History;

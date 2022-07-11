@@ -91,9 +91,10 @@ def event_handler_quote_update(message):
     qt.save()
 
     # update required LTP to papertrade database
-    q = Papertrade.objects.filter(name=instrument).filter(isCompleted=False)
-    q.update(ltp=ltp)
-    q.save()
+    if Papertrade.objects.filter(name=instrument).filter(isCompleted=False).exists():
+        q = Papertrade.objects.filter(name=instrument).filter(isCompleted=False)
+        q.update(ltp=ltp)
+        q.save()
 
     timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
     vol = message['volume']

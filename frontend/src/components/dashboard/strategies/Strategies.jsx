@@ -1,25 +1,11 @@
 import { Box } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { useContext } from "react";
 import StrategiesCard from "./StrategiesCard";
-import { BaseURL } from "../../../BaseURL";
+import { StrategiesContext } from "../../../StrategiesContext";
 
 function Strategies({ toggle, strategy }) {
-  const [strategies, setStrategies] = useState([]);
-
-  useEffect(() => {
-    fetch(BaseURL + "api/strategies/", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => {
-        if (response.ok) return response.json();
-      })
-      .then((data) => {
-        setStrategies(data);
-      })
-      .catch((error) => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { strategies } = useContext(StrategiesContext);
+  console.log(strategies);
 
   return (
     <>

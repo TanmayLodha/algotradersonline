@@ -58,13 +58,14 @@ class Papertrade(models.Model):
 
     def set_active(self):
         if (self.signal == "BUY" and self.ltp >= self.buy_price
-                and self.isActive == False) or (self.signal == "SELL"
+                and self.isActive is False and self.ltp != 0) or (self.signal == "SELL"
                                                 and self.sell_price >= self.ltp
-                                                and self.isActive == False):
+                                                and self.isActive is False and self.ltp != 0):
             self.isActive = True
 
     def set_complete(self, username):
         if self.isActive is True and self.isCompleted is False:
+            self.end_time = datetime.datetime.now().strftime("%H:%M")
             if self.signal == "BUY":
                 if (self.ltp >= (self.buy_price + self.target)
                         or self.ltp <= self.stop_loss):

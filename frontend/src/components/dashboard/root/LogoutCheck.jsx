@@ -13,7 +13,7 @@ const LogoutCheck = ({ close, toggle }) => {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const handlelogout = () => {
-    localStorage.removeItem("user");
+    localStorage.clear();
     setUser(null);
     navigate("", { replace: true });
     close();

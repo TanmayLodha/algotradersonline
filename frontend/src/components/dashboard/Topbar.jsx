@@ -61,10 +61,10 @@ const LinkTab = styled((props) => (
 function Topbar({ toggle, drawer }) {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
-  const [isDesktop, setDesktop] = useState(window.innerWidth <= 1024);
+  const [isDesktop, setDesktop] = useState(window.innerWidth <= 1200);
 
   const updateMedia = () => {
-    setDesktop(window.innerWidth <= 1024);
+    setDesktop(window.innerWidth <= 1200);
   };
 
   useEffect(() => {
@@ -112,6 +112,7 @@ function Topbar({ toggle, drawer }) {
             orientation="vertical"
             sx={{
               pt: 2,
+              width: "30vw",
               transition: " all .15s ease-in-out",
             }}>
             <LinkTab
