@@ -24,8 +24,7 @@ const StrategiesCard = ({ props, toggle, strategy }) => {
     <>
       <Card
         sx={{
-          width: "20vw",
-          // height: "15vw",
+          width: "300px",
           m: 1,
           boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.1)",
           transition: " all .15s ease-in-out",

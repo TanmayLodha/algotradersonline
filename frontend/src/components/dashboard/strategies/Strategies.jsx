@@ -12,10 +12,10 @@ function Strategies({ toggle, strategy }) {
       <Box
         component="main"
         sx={{
-          width: "89vw",
           ml: 1,
           p: 1,
           display: "flex",
+          flexWrap: "wrap",
         }}>
         {strategies.map((data, i) => {
           return (

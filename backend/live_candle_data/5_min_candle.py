@@ -13,7 +13,7 @@ import django
 sys.path.append("/Users/nitishgupta/Desktop/algoTrade/backend")
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
-from strategiesAPI.models import LTP
+from optionchain.models import LTP
 
 
 SCRIPT_LIST = [
@@ -76,14 +76,13 @@ def event_handler_quote_update(message):
     q.ltp = ltp
     q.save()
 
-    timestamp = pd.to_datetime(message['exchange_time_stamp'], unit='s')
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     vol = message['volume']
     exchange = message['instrument'].exchange
     high = message['high']
     low = message['low']
     atp = message['atp']
     global df
-    # current_time = time.strftime("%Y-%m-%d %H:%M:%S", localtime())
     df_new = pd.DataFrame(
         {
             'symbol': instrument,
@@ -124,9 +123,9 @@ def get_ohlc(dataframe):
     global df_final
     global x
     book = load_workbook(
-        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
+        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
     writer = pd.ExcelWriter(
-        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx',
+        f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx',
         engine='openpyxl')
     writer.book = book
     writer.sheets = {ws.title: ws for ws in book.worksheets}
@@ -162,12 +161,11 @@ def get_ohlc(dataframe):
 
 
 if __name__ == '__main__':
-    while ((datetime.datetime.now().time() <= datetime.time(9, 14, 25))
+    while ((datetime.datetime.now().time() <= datetime.time(9, 14, 00))
            or (datetime.datetime.now().time() >= datetime.time(15, 30, 00))):
         pass
 
     login()
-    # interval = ORB_timeFrame - datetime.datetime.now().second
     main_interval = (5 - datetime.datetime.now().minute % 5) * 60 - (
         datetime.datetime.now().second)
     print("start in ", main_interval)

@@ -22,3 +22,5 @@ class PapertradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Papertrade
         fields = '__all__'
+
+

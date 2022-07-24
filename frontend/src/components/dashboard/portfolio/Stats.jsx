@@ -12,6 +12,11 @@ const Stats = ({ data }) => {
   let total =
     data.length === 0 ? 0 : data.reduce((total, obj) => obj.net_pl + total, 0);
 
+  let invested =
+    data.length === 0
+      ? 0
+      : data.reduce((total, obj) => obj.Invested + total, 0);
+
   return (
     <Grid container>
       <Grid item xs={6}>
@@ -27,7 +32,7 @@ const Stats = ({ data }) => {
           }}>
           <CardContent>
             <Typography varient="subtitle" sx={{ fontWeight: 600 }}>
-              Total Equity
+              Total Traded Value
             </Typography>
             {data.length === 0 ? (
               <Typography
@@ -41,7 +46,7 @@ const Stats = ({ data }) => {
                   varient="subtitle"
                   sx={{ fontWeight: 600, fontSize: "3rem", mt: 1 }}>
                   ₹
-                  {(total + data.length * 100000).toLocaleString("en-IN", {
+                  {(total + invested).toLocaleString("en-IN", {
                     maximumFractionDigits: 2,
                   })}
                 </Typography>

@@ -1,5 +1,6 @@
-import React from "react";
-
+import React, { useContext } from "react";
+import { BaseURL } from "../../../BaseURL";
+import { UserContext } from "../../../UserContext";
 import {
   Typography,
   TableContainer,
@@ -8,9 +9,38 @@ import {
   TableCell,
   TableRow,
   TableBody,
+  Button,
 } from "@mui/material";
 
 function MyTable({ activeData }) {
+  const { user } = useContext(UserContext);
+  const current = JSON.parse(user);
+
+  const handleSqaureoff = (name) => {
+    const request = {
+      name: name,
+    };
+    fetch(BaseURL + "api/manual_stop/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${current.data.token}`,
+      },
+      body: JSON.stringify(request),
+    })
+      .then((response) => {
+        if (response.ok === true) return response.json();
+        else {
+          throw new Error();
+        }
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   return (
     <>
       {activeData.length === 0 ? (
@@ -79,6 +109,13 @@ function MyTable({ activeData }) {
                       Gross P/L
                     </Typography>
                   </TableCell>
+                  <TableCell>
+                    <Typography
+                      variant="subtitle"
+                      sx={{ fontSize: "1rem", fontWeight: 600 }}>
+                      Manual Square off
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -125,6 +162,13 @@ function MyTable({ activeData }) {
                         </TableCell>
                       </>
                     )}
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleSqaureoff(row.name)}>
+                        SQUARE OFF
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

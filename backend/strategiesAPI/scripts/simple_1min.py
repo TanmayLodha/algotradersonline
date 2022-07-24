@@ -130,7 +130,7 @@ def main():
 
     while datetime.datetime.now().time() < datetime.time(9, 15, 00):
         pass
-    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
+
     interval = 60 - datetime.datetime.now().second
     time.sleep(interval + 2)
 
@@ -221,18 +221,18 @@ def start_paper_trade():
 
     while datetime.datetime.now().time() < datetime.time(9, 15, 00):
         pass
-    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
+
     interval = 60 - datetime.datetime.now().second
     time.sleep(interval + 2)
 
     while datetime.time(9, 16, 0) <= datetime.datetime.now().time() <= datetime.time(15, 0, 0):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
-            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
+            f'/home/algotest/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
-        # print(rows_num)
+
         x = rows_num - 84
         print(f'1MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
@@ -257,6 +257,7 @@ def start_paper_trade():
             h1 = high + high * 0.1 / 100
             quantity_b = int(money / h1)
             quantity_s = int(money / l1)
+
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and (
                     vol > vo) and (open < close)
                     and (range_oc2 > range_hl2 * 0.90) and (close > atp)):
@@ -272,6 +273,7 @@ def start_paper_trade():
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and (
                     vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.90) and (close < atp)):
                 print(f"Exit {name} {vol} {vo}")
+
                 stop_loss = low - 0.5 + (high - low) / 2
                 square_off = (high - low)
                 TradedStocks.objects.create(username=algotrade_username, stock_name=name)

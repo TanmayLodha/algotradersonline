@@ -95,6 +95,7 @@ def test(i):
     to_datetime = date_end - datetime.timedelta(
         days=1)
     interval1 = "5_MIN"  # ["DAY", "1_HR", "3_HR", "1_MIN", "5_MIN", "15_MIN", "60_MIN"]
+   
     indices = False
     df1 = pd.DataFrame(
         get_historical(instrument, from_datetime, to_datetime, interval1,
@@ -125,13 +126,14 @@ def main():
     while datetime.datetime.now().time() < datetime.time(9, 19, 00):
         pass
     interval = (5 - datetime.datetime.now().minute % 5) * 60 - datetime.datetime.now().second
+ 
     time.sleep(interval + 2)
 
     while ((datetime.time(9, 20, 5) <= datetime.datetime.now().time()
             <= datetime.time(15, 25, 5))):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
-            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
+            f'/home/algotest/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}.xlsx')
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
@@ -218,7 +220,7 @@ def start_paper_trade():
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
-
+        # print(rows_num)
         x = rows_num - 80
         print(f'5MIN candle at {datetime.datetime.now().time().strftime("%H:%M")}')
         for y in range(len(instrument_list)):
@@ -239,7 +241,7 @@ def start_paper_trade():
             h1 = high + high * 0.1 / 100
             quantity_b = int(money / h1)
             quantity_s = int(money / l1)
-
+  
             if ((not TradedStocks.objects.filter(username=algotrade_username).filter(stock_name=name).exists()) and
                     (vol > vo) and (open < close) and (range_oc2 > range_hl2 * 0.80) and (close - open < 0.03 * open)
                     and (close > atp)):

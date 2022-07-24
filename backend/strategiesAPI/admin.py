@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Strategies, Credentials, Papertrade, TradedStocks
 
+
 # Register your models here.
 
 
@@ -22,12 +23,9 @@ class PaperTradeAdmin(admin.ModelAdmin):
         'username', ('signal', 'name'),
         ('quantity', 'buy_price', 'sell_price'), ('stop_loss', 'target'),
         ('isActive', 'isCompleted'), ('start_time', 'end_time', 'date'), ("historical_volume", "current_volume"), 'ltp',
-        ('net_pl', 'net_charges')
+        ('net_pl', 'net_charges','Invested')
     ]
     list_filter = ("username", "date" )
-
-
-
 
 
 @admin.register(TradedStocks)

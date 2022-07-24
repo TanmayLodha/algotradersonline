@@ -16,6 +16,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -24,21 +25,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 with open(os.path.join(BASE_DIR, 'secret_key.txt')) as f:
     SECRET_KEY = f.read().strip()
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    '172.22.2.67', '127.0.0.1', '115.243.103.16', '192.168.29.214', 'localhost'
-]
+ALLOWED_HOSTS = ['172.22.2.68', '127.0.0.1', '115.243.103.16', '192.168.29.214', 'localhost']
+
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin', 'django.contrib.auth',
-    'django.contrib.contenttypes', 'django.contrib.sessions',
-    'django.contrib.messages', 'django.contrib.staticfiles', 'registerLogin',
-    'rest_framework', 'knox', 'corsheaders', 'django_extensions',
-    'strategiesAPI', 'optionsChain'
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'registerLogin',
+    'rest_framework',
+    'knox',
+    'corsheaders',
+    'django_extensions',
+    'strategiesAPI',
+    'optionchain',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +82,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -83,27 +93,25 @@ DATABASES = {
     }
 }
 
+
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME':
-            'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME':
-            'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME':
-            'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME':
-            'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -115,6 +123,7 @@ TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 
 USE_TZ = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -130,7 +139,7 @@ AUTH_USER_MODEL = 'registerLogin.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://172.22.2.67",
+    "http://172.22.2.68",
     "http://115.243.103.16",
     "http://192.168.29.214:3000",
 ]
@@ -141,5 +150,3 @@ REST_FRAMEWORK = {
         'knox.auth.TokenAuthentication',
     ],
 }
-
-# Make APIs not browsable. Only the admin can browse the apis and post data

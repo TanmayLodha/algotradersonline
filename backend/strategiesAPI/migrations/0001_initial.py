@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=20)),
-                ('filePath', models.FilePathField(path='/Users/nitishgupta/Desktop/algoTrade/backend/strategiesAPI/scripts', unique=True)),
+                ('filePath', models.FilePathField(path='/home/vmadmin/Desktop/algoTrade-main/backend/strategiesAPI/scripts', unique=True)),
             ],
         ),
         migrations.CreateModel(

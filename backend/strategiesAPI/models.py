@@ -4,7 +4,6 @@ import os
 from registerLogin.models import CustomUser
 import datetime
 
-
 def scripts_path():
     return os.path.join(settings.BASE_DIR, 'strategiesAPI/scripts')
 
@@ -18,9 +17,7 @@ class Strategies(models.Model):
 
 
 class Credentials(models.Model):
-    userName = models.OneToOneField(CustomUser,
-                                    on_delete=models.CASCADE,
-                                    primary_key=True)
+    userName = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     twoFA = models.CharField(max_length=4)
     password = models.CharField(max_length=50)
     api_key = models.CharField(max_length=100)
@@ -38,7 +35,7 @@ class Papertrade(models.Model):
     buy_price = models.FloatField()
     sell_price = models.FloatField()
     stop_loss = models.FloatField(default=0.0)
-    target = models.FloatField(default=0.0)
+    target = models.FloatField(default=100000)
     isCompleted = models.BooleanField(default=False)
     isActive = models.BooleanField(default=False)
     start_time = models.CharField(max_length=100,
@@ -48,40 +45,70 @@ class Papertrade(models.Model):
                                 default="00:00",
                                 verbose_name='Trade Ended at')
     date = models.DateField(default=datetime.datetime.now, blank=True)
-    historical_volume = models.IntegerField(default=0,
-                                            verbose_name='Historical Volume')
-    current_volume = models.IntegerField(default=0,
-                                         verbose_name='Current Volume')
+    historical_volume = models.IntegerField(default=0,verbose_name='Historical Volume')
+    current_volume = models.IntegerField(default=0,verbose_name='Current Volume')
     ltp = models.FloatField(default=0.0, verbose_name='LTP')
     net_pl = models.FloatField(default=0.0, verbose_name='Net P/L')
-    net_charges = models.FloatField(default=0.0, verbose_name='Total Charges')
-
+    net_charges = models.FloatField(default=0.0,  verbose_name='Total Charges')
+    sl_trail=models.BooleanField(default=False)
+    Invested=models.FloatField(default=100000)
+    
     def set_active(self):
         if (self.signal == "BUY" and self.ltp >= self.buy_price
-                and self.isActive is False and self.ltp != 0) or (self.signal == "SELL"
-                                                and self.sell_price >= self.ltp
-                                                and self.isActive is False and self.ltp != 0):
+            and self.isActive == False and self.ltp !=0) or (self.signal == "SELL"
+                                            and self.sell_price >= self.ltp
+                                            and self.isActive == False and self.ltp!=0):
             self.isActive = True
 
     def set_complete(self, username):
         if self.isActive is True and self.isCompleted is False:
-            self.end_time = datetime.datetime.now().strftime("%H:%M")
             if self.signal == "BUY":
-                if (self.ltp >= (self.buy_price + self.target)
-                        or self.ltp <= self.stop_loss):
+                if (self.ltp >= (self.buy_price + self.target) or self.ltp <=
+                        self.stop_loss):
                     self.isCompleted = True
                     self.sell_price = self.ltp
+                    self.end_time=datetime.datetime.now().time().strftime("%H:%M")
                     TradedStocks.objects.all().filter(
                         username=username).filter(
-                            stock_name=self.name).delete()
+                        stock_name=self.name).delete()
             elif self.signal == "SELL":
-                if (self.ltp <= (self.sell_price - self.target)
-                        or self.ltp >= self.stop_loss):
+                if (self.ltp <= (self.sell_price - self.target) or self.ltp >=
+                        self.stop_loss):
                     self.isCompleted = True
                     self.buy_price = self.ltp
+                    self.end_time=datetime.datetime.now().time().strftime("%H:%M")
                     TradedStocks.objects.all().filter(
                         username=username).filter(
-                            stock_name=self.name).delete()
+                        stock_name=self.name).delete()
+
+    def sl_trailing(self):
+        if self.isActive is True and self.isCompleted is False and self.sl_trail is True:
+            if self.signal == "BUY":
+                if (self.ltp-self.sell_price>=30):
+                    self.sell_price = self.ltp
+                    self.stop_loss+=30
+            elif self.signal == "SELL":
+                if (self.buy_price-self.ltp>=30):
+                    self.buy_price = self.ltp
+                    self.stop_loss-=30
+    
+    def manual_stop(self,username):
+        if self.isActive is True and self.isCompleted is False:
+            if self.signal == "BUY":
+                self.isCompleted = True
+                self.sell_price = self.ltp
+                self.end_time=datetime.datetime.now().time().strftime("%H:%M")
+                TradedStocks.objects.all().filter(
+                    username=username).filter(
+                    stock_name=self.name).delete()
+            elif self.signal == "SELL":
+                self.isCompleted = True
+                self.buy_price = self.ltp
+                self.end_time=datetime.datetime.now().time().strftime("%H:%M")
+                TradedStocks.objects.all().filter(
+                    username=username).filter(
+                    stock_name=self.name).delete()
+
 
     def set_npl(self):
         if (self.isActive is True and self.isCompleted is True
@@ -94,11 +121,16 @@ class Papertrade(models.Model):
             stamp_duty = turnover * 0.0001
             service_tax = (brokerage + tran_charges) * 0.15
             self.net_charges = brokerage + tran_charges + sebi_charges + stamp_duty + service_tax + stt
-            self.net_pl = (self.sell_price -
-                           self.buy_price) * self.quantity - self.net_charges
-
+            self.net_pl = (self.sell_price - self.buy_price) * self.quantity - self.net_charges
+        elif (self.isActive is True and self.isCompleted is True
+                and self.net_charges == 200 and self.net_pl==0.0):
+            self.net_pl = (self.sell_price - self.buy_price) * self.quantity - self.net_charges
+                
     def __str__(self):
         return f"{self.username} {self.name}"
+
+    def get_name(self):
+        return self.name
 
 
 class TradedStocks(models.Model):

@@ -20,7 +20,7 @@ django.setup()
 from ..models import Papertrade
 
 traded_stocks = []
-instrument_list = ['BANKNIFTY JUL FUT', 'NIFTY JUL FUT']
+instrument_list = ['BANKNIFTY JUL FUT','NIFTY JUL FUT']
 
 access_token = AliceBlue.login_and_get_access_token(username=username,
                                                     password=password,
@@ -103,7 +103,7 @@ def test(i):
     high = s1["high"][0]
     low = s2["low"][0]
 
-    return high, low
+    return high,low
 
 
 def row_count(ws):
@@ -171,8 +171,7 @@ def row_count(ws):
 #                                   trailing_sl=None,
 #                                   is_amo=False)
 
-#             if (name not in traded_stocks) and (vol > vo) and (open > close) and
-#             (range_oc1 > range_hl1 * 0.80) and (close < atp):
+#             if (name not in traded_stocks) and (vol > vo) and (open > close) and (range_oc1 > range_hl1 * 0.80) and (close < atp):
 #                 print(f"Exit {name} {name} {vol} {vo}")
 #                 traded_stocks.append(name)
 #                 alice.place_order(transaction_type=TransactionType.Sell,
@@ -199,55 +198,61 @@ def start_paper_trade():
     global algotrade_username
     for x in range(len(instrument_list)):
         name = instrument_list[x]
-        high, low = test(name)
-        data = {'symbol': name, 'high': high, 'low': low}
+        high,low = test(name)
+        data = {'symbol': name, 'high': high,'low':low}
         df_histo = pd.DataFrame(data, index=[x])
         df_historical = pd.concat([df_historical, df_histo])
         print(f"{df_historical['symbol'][x]}  {df_historical['high'][x]} {df_historical['low'][x]}")
 
     while datetime.datetime.now().time() < datetime.time(9, 30, 00):
         pass
-    # interval = (5 - datetime.datetime.now().minute % 5)*60 - (datetime.datetime.now().second)
+
     interval = 60 - datetime.datetime.now().second
     time.sleep(interval + 2)
 
     while datetime.time(9, 31, 0) <= datetime.datetime.now().time() <= datetime.time(15, 0, 0):
         start = time.time()
         wrkbk = openpyxl.load_workbook(
-            f'/Users/nitishgupta/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
+            f'/home/algotest/Desktop/algoTrade/day_data/{datetime.datetime.now().strftime("%Y-%m-%d")}_1MIN.xlsx')
         wrkbk.active = wrkbk['Sheet1']
         sh = wrkbk.active
         rows_num = row_count(sh)
-        y = 0
+        # print(rows_num)
+
         print(f'FUTURES candle at {datetime.datetime.now().time().strftime("%H:%M")}')
-        for x in range(rows_num-84, rows_num):
+        for x in range(rows_num-84,rows_num):
             name = sh.cell(row=x, column=2).value
+            y = 0 if name == "BANKNIFTY JUL FUT" else 1
             if name == "BANKNIFTY JUL FUT" or name == 'NIFTY JUL FUT':
                 hi = df_historical['high'][y]
                 lo = df_historical['low'][y]
-                y += 1
-
                 close = sh.cell(row=x, column=5).value
                 high = sh.cell(row=x, column=6).value
                 low = sh.cell(row=x, column=7).value
-
-                if (name not in traded_stocks) and close > hi:
+                if ((name not in traded_stocks) and close>hi):
                     traded_stocks.append(name)
-                    stop_loss = hi-30
-                    square_off = 100
+                    if(name == "BANKNIFTY JUL FUT"):
+                        # square_off=100
+                        stop_loss = hi-50
+                    else:
+                        # square_off=50
+                        stop_loss = hi-30
                     print(f"Entry {name} {high} {hi}")
-                    Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
-                                              username=algotrade_username, signal='BUY', name=name, quantity=50,
-                                              buy_price=hi+20, sell_price=0, stop_loss=stop_loss, target=square_off)
+                    Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),username=algotrade_username, signal='BUY', name=name, quantity=50,
+                                            buy_price=hi+20, sell_price=hi+20, stop_loss=stop_loss,sl_trail=True,Invested=(hi+20)*50)
 
-                if (name not in traded_stocks) and close < lo:
+                if (name not in traded_stocks) and close<lo:
                     print(f"Exit {name} {low} {lo}")
                     traded_stocks.append(name)
-                    stop_loss = lo + 30
-                    square_off = 100
-                    Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),
-                                              username=algotrade_username, signal='SELL', name=name, quantity=50,
-                                              buy_price=0, sell_price=lo-20, stop_loss=stop_loss, target=square_off)
+                    if(name == "BANKNIFTY JUL FUT"):
+                        # square_off = 100
+                        stop_loss = lo + 50
+                    else:
+                        # square_off=50
+                        stop_loss = lo + 30
+                    Papertrade.objects.create(start_time=datetime.datetime.now().time().strftime("%H:%M"),username=algotrade_username, signal='SELL', name=name, quantity=50 ,
+                                            buy_price=lo-20, sell_price=lo-20, stop_loss=stop_loss,sl_trail=True,Invested=(lo-20)*50)
+            
 
         wrkbk.close()
         interval = 60 - time.time() + start
