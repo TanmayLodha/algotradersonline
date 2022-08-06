@@ -1,8 +1,6 @@
 # algotradersonline
 This is an algorithmic trading website that offers various strategies to execute in Indian stock market. It also offers a very robust paper trading test these strategies and mechanism to directly execute these strategies to their demat account.
 
-## Site Link
-www.algotradersonline.com
 
 ## General Information
 <ul>
