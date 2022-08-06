@@ -48,4 +48,4 @@ For backend, you can find all the dependencies in <code>requirements.txt</code> 
 </ul>
 
 ## Project Status
-In Progress. We are just a team of 4 students :)
+In Progress. We are just a team of 4 students.
